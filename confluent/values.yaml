@@ -1,0 +1,44 @@
+# helm 
+---
+# service account granting access to vault. Specifying here gives flat level of access to all components. Use pod template for granular access
+serviceAccount.name: confluent-sa
+
+#Injects the Vault Agent container to the pod.
+vault.hashicorp.com/agent-inject: "true"
+
+#Updates the secret when its rotated.
+vault.hashicorp.com/agent-inject-status: update
+vault.hashicorp.com/preserve-secret-case: "true"
+
+# password for jks 
+vault.hashicorp.com/secret-volume-path-truststore.jks: /vault/secrets
+vault.hashicorp.com/agent-inject-file-jksPassword.txt: jksPassword.txt
+vault.hashicorp.com/agent-inject-secret-jksPassword.txt: secret/jksPassword.txt
+vault.hashicorp.com/agent-inject-template-jksPassword.txt: |-
+  {{- with secret "secret/jksPassword.txt" -}}
+  {{ .Data.data.password }}
+  {{- end }}
+
+# truststore jks file is the same for everyone
+vault.hashicorp.com/secret-volume-path-jksPassword.txt: /vault/secrets
+vault.hashicorp.com/agent-inject-file-truststore.jks: truststore.jks
+vault.hashicorp.com/agent-inject-secret-truststore.jks: secret/kafka-truststore.jks
+vault.hashicorp.com/agent-inject-template-truststore.jks: |-
+  {{- with secret "secret/kafka-truststore.jks" -}}
+  {{ .Data.data.truststore | base64Decode }}
+  {{- end }}
+
+
+
+
+
+
+vault.hashicorp.com/agent-inject-secret-tls-zookeeper: internal/data/tls-zookeeper
+vault.hashicorp.com/agent-inject-secret-tls-kafka: internal/data/tls-kafka
+vault.hashicorp.com/agent-inject-secret-tls-controlcenter: internal/data/tls-controlcenter
+vault.hashicorp.com/agent-inject-secret-tls-schemaregistry: internal/data/tls-schemaregistry
+vault.hashicorp.com/agent-inject-secret-tls-connect: internal/data/tls-connect
+vault.hashicorp.com/agent-inject-secret-tls-ksqldb: internal/data/tls-ksqldb
+vault.hashicorp.com/agent-inject-secret-tls-kafkarestproxy: internal/data/tls-kafkarestproxy
+
+vault.hashicorp.com/role: confluent-operator

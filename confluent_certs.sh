@@ -3,13 +3,13 @@
 WORKDIR="generated"
 CONFLUENT_SETTINGS_DIR="confluent"
 COMPONENTS="
-    zookeeper-server
-    kafka-server
-    controlcenter-server
-    schemaregistry-server
-    connect-server
-    ksqldb-server
-    kafkarestproxy-server"
+    zookeeper
+    kafka
+    controlcenter
+    schemaregistry
+    connect
+    ksqldb
+    kafkarestproxy"
 
 for COMPONENT in $COMPONENTS ; do
     echo "SSL cert for $COMPONENT"
@@ -18,6 +18,6 @@ for COMPONENT in $COMPONENTS ; do
     cfssl gencert -ca=$WORKDIR/cacerts.pem \
         -ca-key=$WORKDIR/rootCAkey.pem \
         -config=$CONFLUENT_SETTINGS_DIR/ca-config.json \
-        -profile=server $CONFLUENT_SETTINGS_DIR/$COMPONENT-domain.json | cfssljson -bare $WORKDIR/$COMPONENT
+        -profile=server $CONFLUENT_SETTINGS_DIR/$COMPONENT-server-domain.json | cfssljson -bare $WORKDIR/$COMPONENT
 
 done
