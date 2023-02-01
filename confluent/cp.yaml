@@ -16,6 +16,16 @@ spec:
       - RULE:.*CN[\s]?=[\s]?([a-zA-Z0-9.]*)?.*/$1/
   # tls:
   #   secretRef: tls-zookeeper
+  podTemplate:
+    annotations:
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/zookeeper-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/zookeeper-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: Kafka
@@ -102,6 +112,16 @@ spec:
         type: mtls
       tls:
         enabled: true
+  podTemplate:
+    annotations:
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/kafka-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/kafka-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}  
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: Connect
@@ -139,6 +159,16 @@ spec:
         #   secretRef: connect-mds-client
       tls:
         enabled: true
+  podTemplate:
+    annotations:
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/connect-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/connect-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}        
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: SchemaRegistry
@@ -176,6 +206,16 @@ spec:
         #   secretRef: sr-mds-client
       tls:
         enabled: true
+  podTemplate:
+    annotations:
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/schemaregistry-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/schemaregistry-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}            
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: KsqlDB
@@ -214,6 +254,16 @@ spec:
         #   secretRef: ksqldb-mds-client
       tls:
         enabled: true
+  podTemplate:
+    annotations:
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/ksqldb-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/ksqldb-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}                  
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: ControlCenter
@@ -272,6 +322,16 @@ spec:
       url: https://schemaregistry.confluent.svc.cluster.local:8081
       tls:
         enabled: true
+  podTemplate:
+    annotations:
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/controlcenter-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/controlcenter-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}             
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: KafkaRestClass
@@ -284,4 +344,13 @@ spec:
       type: bearer
       # bearer:
       #   secretRef: rest-credential
-
+  podTemplate:
+    annotations:
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/kafkarestproxy-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/kafkarestproxy-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}             

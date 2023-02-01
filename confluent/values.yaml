@@ -10,7 +10,7 @@ vault.hashicorp.com/agent-inject: "true"
 vault.hashicorp.com/agent-inject-status: update
 vault.hashicorp.com/preserve-secret-case: "true"
 
-# password for jks 
+# password for jks is the same for everyone
 vault.hashicorp.com/secret-volume-path-truststore.jks: /vault/secrets
 vault.hashicorp.com/agent-inject-file-jksPassword.txt: jksPassword.txt
 vault.hashicorp.com/agent-inject-secret-jksPassword.txt: secret/jksPassword.txt
