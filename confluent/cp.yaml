@@ -196,12 +196,12 @@ spec:
         enabled: true
     mds:
       endpoint: https://kafka.confluent.svc.cluster.local:8090
-      # tokenKeyPair:
-      #   secretRef: mds-token
+      tokenKeyPair:
+        directoryPathInContainer: /vault/secrets
       authentication:
         type: bearer
-        # bearer:
-        #   secretRef: connect-mds-client
+        bearer:
+          directoryPathInContainer: /vault/secrets
       tls:
         enabled: true
   podTemplate:
@@ -269,12 +269,12 @@ spec:
         enabled: true
     mds:
       endpoint: https://kafka.confluent.svc.cluster.local:8090
-      # tokenKeyPair:
-      #   secretRef: mds-token
+      tokenKeyPair:
+        directoryPathInContainer: /vault/secrets
       authentication:
         type: bearer
-        # bearer:
-        #   secretRef: sr-mds-client
+        bearer:
+          directoryPathInContainer: /vault/secrets
       tls:
         enabled: true
   podTemplate:
@@ -338,12 +338,12 @@ spec:
         enabled: true
     mds:
       endpoint: https://kafka.confluent.svc.cluster.local:8090
-      # tokenKeyPair:
-      #   secretRef: mds-token
+      tokenKeyPair:
+        directoryPathInContainer: /vault/secrets
       authentication:
         type: bearer
-        # bearer:
-        #   secretRef: ksqldb-mds-client
+        bearer:
+          directoryPathInContainer: /vault/secrets
       tls:
         enabled: true
   podTemplate:
@@ -418,12 +418,12 @@ spec:
         enabled: true
     mds:
       endpoint: https://kafka.confluent.svc.cluster.local:8090
-      # tokenKeyPair:
-      #   secretRef: mds-token
+      tokenKeyPair:
+        directoryPathInContainer: /vault/secrets
       authentication:
         type: bearer
-        # bearer:
-        #   secretRef: c3-mds-client
+        bearer:
+          directoryPathInContainer: /vault/secrets
       tls:
         enabled: true
     connect:
@@ -498,15 +498,15 @@ spec:
   kafkaRest:
     authentication:
       type: bearer
-      # bearer:
-      #   secretRef: rest-credential
-  podTemplate:
-    annotations:
-      # keystore
-      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
-      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
-      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/kafkarestproxy-keystore.jks
-      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
-        {{- with secret "secret/kafkarestproxy-keystore.jks" -}}
-        {{ .Data.data.keystore | base64Decode }}
-        {{- end }}             
+      bearer:
+        secretRef: rest-credential
+  # podTemplate:
+  #   annotations:
+  #     # keystore
+  #     vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+  #     vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+  #     vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/kafkarestproxy-keystore.jks
+  #     vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+  #       {{- with secret "secret/kafkarestproxy-keystore.jks" -}}
+  #       {{ .Data.data.keystore | base64Decode }}
+  #       {{- end }}             
