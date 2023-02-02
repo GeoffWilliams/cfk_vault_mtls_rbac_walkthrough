@@ -87,8 +87,8 @@ spec:
     mds:
       tls:
         enabled: true
-      # tokenKeyPair:
-      #   secretRef: mds-token
+      tokenKeyPair:
+        directoryPathInContainer: /vault/secrets
       externalAccess:
         type: loadBalancer
         loadBalancer:
@@ -100,8 +100,8 @@ spec:
           address: ldap://ldap.confluent.svc.cluster.local:389
           authentication:
             type: simple
-            # simple:
-            #   secretRef: credential
+            simple:
+              directoryPathInContainer: /vault/secrets
           configurations:
             groupNameAttribute: cn
             groupObjectClass: group
@@ -116,8 +116,8 @@ spec:
     kafkaRest:
       authentication:
         type: bearer
-        # bearer:
-        #   secretRef: mds-client
+        bearer:
+          directoryPathInContainer: /vault/secrets
     zookeeper:
       endpoint: zookeeper.confluent.svc.cluster.local:2182
       authentication:
@@ -216,7 +216,7 @@ spec:
         {{- end }}
 
       # assorted secrets
-     vault.hashicorp.com/agent-inject-secret-connect-basic: secret/connect/basic.txt
+      vault.hashicorp.com/agent-inject-secret-connect-basic: secret/connect/basic.txt
       vault.hashicorp.com/secret-volume-path-connect-basic: /vault/secrets
       vault.hashicorp.com/agent-inject-file-connect-basic: basic.txt # this are mandatory names
       vault.hashicorp.com/agent-inject-template-connect-basic: |
