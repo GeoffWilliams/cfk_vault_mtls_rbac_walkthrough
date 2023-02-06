@@ -23,7 +23,7 @@ for COMPONENT in $COMPONENTS ; do
 done
 
 echo "copy truststore to vault pod"
-kubectl -n hashicorp cp $WORKDIR/$JKS_FILE vault-0:/tmp
+kubectl -n hashicorp cp $WORKDIR/truststore.jks vault-0:/tmp
 
 echo "load truststore into vault"
 kubectl exec -it vault-0 --namespace hashicorp -- sh -c "cat /tmp/truststore.jks | base64 | vault kv put /secret/truststore.jks truststore=-"
