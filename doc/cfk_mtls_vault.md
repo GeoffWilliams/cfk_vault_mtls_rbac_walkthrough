@@ -44,6 +44,14 @@ vault write auth/kubernetes/role/confluent-operator \
 # 6. Load jks files into vault
 ./load_jks_files_into_vault.sh
 
+# 7. MDS 
+https://docs.confluent.io/platform/current/kafka/configure-mds/index.html#create-a-pem-key-pair
+
+openssl genrsa --traditional -out credentials/rbac/mds-tokenkeypair.txt 2048
+openssl rsa -in credentials/rbac/mds-tokenkeypair.txt -outform PEM -pubout -out credentials/rbac/mds-publickey.txt
+
+
+
 # 7. Load password for jks keystore into vault
 kubectl exec -it vault-0 --namespace hashicorp -- vault kv put secret/jksPassword.txt password=jksPassword=mystorepassword
 
@@ -99,6 +107,10 @@ helm upgrade -f confluent/values.yaml --install confluent-operator confluentinc/
 # 5. Load TLS data into vault
 vault kv put secret/github \
     accesstoken="<your-GitHub-access-token>"
+
+
+# 5. setup fake ldap server
+helm upgrade --install -f confluent-kubernetes-examples/assets/openldap/ldaps-rbac.yaml test-ldap confluent-kubernetes-examples/assets/openldap -n confluent
 
 
 
