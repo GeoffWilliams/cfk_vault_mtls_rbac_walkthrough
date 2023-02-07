@@ -7,7 +7,7 @@ spec:
   replicas: 3
   image:
     application: confluentinc/cp-zookeeper:7.3.1
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   dataVolumeCapacity: 10Gi
   logVolumeCapacity: 10Gi
   authentication:
@@ -84,7 +84,7 @@ spec:
   replicas: 3
   image:
     application: confluentinc/cp-server:7.3.1
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   dataVolumeCapacity: 10Gi
   tls:
     directoryPathInContainer: /vault/secrets
@@ -96,8 +96,8 @@ spec:
     - User:kafka
   configOverrides:
     server: 
-      - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer 
-      - confluent.authorizer.access.rule.providers=ZK_ACL,CONFLUENT      
+    - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer
+    - confluent.authorizer.access.rule.providers=ZK_ACL,CONFLUENT
   services:
     mds:
       tls:
@@ -141,7 +141,7 @@ spec:
       vault.hashicorp.com/secret-volume-path-kafka-keystore.jks: /vault/secrets
       vault.hashicorp.com/agent-inject-file-kafka-keystore.jks: keystore.jks
       vault.hashicorp.com/agent-inject-secret-kafka-keystore.jks: secret/kafka-keystore.jks
-      vault.hashicorp.com/agent-inject-template-keystore.jks: |
+      vault.hashicorp.com/agent-inject-template-kafka-keystore.jks: |
         {{- with secret "secret/kafka-keystore.jks" -}}
         {{ .Data.data.keystore | base64Decode }}
         {{- end }}
@@ -294,7 +294,7 @@ spec:
 #   replicas: 3
 #   image:
 #     application: confluentinc/cp-server:7.3.1
-#     init: confluentinc/confluent-init-container:2.5.0
+#     init: confluentinc/confluent-init-container:2.5.1
 #   dataVolumeCapacity: 10Gi
 #   configOverrides:
 #     server: 
@@ -462,7 +462,7 @@ spec:
   replicas: 2
   image:
     application: confluentinc/cp-server-connect:7.3.1
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   tls:
     directoryPathInContainer: /vault/secrets
   # license:
@@ -576,7 +576,7 @@ spec:
   replicas: 1
   image:
     application: confluentinc/cp-schema-registry:7.3.1
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   tls:
     directoryPathInContainer: /vault/secrets
   # license:
@@ -682,7 +682,7 @@ spec:
   replicas: 2
   image:
     application: confluentinc/cp-ksqldb-server:7.3.1
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   dataVolumeCapacity: 10Gi
   authorization:
     type: rbac
@@ -803,7 +803,7 @@ spec:
         timeoutSeconds: 500
   image:
     application: confluentinc/cp-enterprise-control-center:7.3.1
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   dataVolumeCapacity: 10Gi
   authorization:
     type: rbac
@@ -933,26 +933,14 @@ spec:
         {{- with secret "secret/controlcenter/bearer.txt" -}}
         {{ .Data.data.bearer | base64Decode }}
         {{- end }}
----
+---      
 apiVersion: platform.confluent.io/v1beta1
 kind: KafkaRestClass
 metadata:
   name: default
-  namespace: confluent
 spec:
   kafkaRest:
     authentication:
       type: bearer
       bearer:
         secretRef: rest-credential
-  # podTemplate:
-  #   serviceAccountName: confluent-sa
-  #   annotations:
-  #     # keystore
-  #     vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
-  #     vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
-  #     vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/kafkarestproxy-keystore.jks
-  #     vault.hashicorp.com/agent-inject-template-keystore.jks: |-
-  #       {{- with secret "secret/kafkarestproxy-keystore.jks" -}}
-  #       {{ .Data.data.keystore | base64Decode }}
-  #       {{- end }}             
