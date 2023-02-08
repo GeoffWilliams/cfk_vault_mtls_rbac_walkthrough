@@ -1,0 +1,113 @@
+apiVersion: v1
+items:
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-connect-0
+  spec:
+    clustersScopeByIds:
+      connectClusterId: confluent.connect  confluent.connect
+    principal:
+      name: connect
+      type: user
+    role: SecurityAdmin
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-connect-1
+  spec:
+    principal:
+      name: connect
+      type: user
+    resourcePatterns:
+    - name: confluent.connect confluent.connect
+      patternType: LITERAL
+      resourceType: Group
+    - name: confluent.connect- confluent.connect-
+      patternType: PREFIXED
+      resourceType: Topic
+    role: ResourceOwner
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-connect-2
+  spec:
+    principal:
+      name: connect
+      type: user
+    resourcePatterns:
+    - name: _confluent-monitoring
+      patternType: PREFIXED
+      resourceType: Topic
+    role: DeveloperWrite
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-controlcenter-0
+  spec:
+    principal:
+      name: c3
+      type: user
+    role: SystemAdmin
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-ksqldb-0
+  spec:
+    clustersScopeByIds:
+      ksqlClusterId: confluent.ksqldb_ confluent.ksqldb_
+    principal:
+      name: ksql
+      type: user
+    resourcePatterns:
+    - name: ksql-cluster
+      patternType: LITERAL
+      resourceType: KsqlCluster
+    role: ResourceOwner
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-ksqldb-1
+  spec:
+    principal:
+      name: ksql
+      type: user
+    resourcePatterns:
+    - name: _confluent-ksql-confluent.ksqldb_ #_confluent-ksql-confluent.ksqldb_
+      patternType: PREFIXED
+      resourceType: Topic
+    role: ResourceOwner
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-schemaregistry-0
+  spec:
+    clustersScopeByIds:
+      schemaRegistryClusterId: id_schemaregistry_confluent  # id_schemaregistry.confluent
+    principal:
+      name: sr
+      type: user
+    role: SecurityAdmin
+- apiVersion: platform.confluent.io/v1beta1
+  kind: ConfluentRolebinding
+  metadata:
+    name: internal-schemaregistry-1
+  spec:
+    principal:
+      name: sr
+      type: user
+    resourcePatterns:
+    - name: _confluent-license
+      patternType: LITERAL
+      resourceType: Topic
+    - name: _schemas_schemaregistry_confluent # _schemas_schemaregistry.confluent
+      patternType: LITERAL
+      resourceType: Topic
+    - name: id_schemaregistry_confluent # id_schemaregistry.confluent
+      patternType: LITERAL
+      resourceType: Group
+    role: ResourceOwner
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
