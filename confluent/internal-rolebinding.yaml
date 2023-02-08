@@ -6,7 +6,7 @@ items:
     name: internal-connect-0
   spec:
     clustersScopeByIds:
-      connectClusterId: confluent.connect  confluent.connect
+      connectClusterId: confluent.connect  #<namespace>.<connect_cluster_name>
     principal:
       name: connect
       type: user
@@ -20,10 +20,10 @@ items:
       name: connect
       type: user
     resourcePatterns:
-    - name: confluent.connect confluent.connect
+    - name: confluent.connect #<namespace>.<connect_cluster_name>
       patternType: LITERAL
       resourceType: Group
-    - name: confluent.connect- confluent.connect-
+    - name: confluent.connect- #<namespace>.<connect_cluster_name>-
       patternType: PREFIXED
       resourceType: Topic
     role: ResourceOwner
@@ -55,7 +55,7 @@ items:
     name: internal-ksqldb-0
   spec:
     clustersScopeByIds:
-      ksqlClusterId: confluent.ksqldb_ confluent.ksqldb_
+      ksqlClusterId: confluent.ksqldb_ #<namespace>.<ksql_cluster_name>_
     principal:
       name: ksql
       type: user
@@ -73,7 +73,7 @@ items:
       name: ksql
       type: user
     resourcePatterns:
-    - name: _confluent-ksql-confluent.ksqldb_ #_confluent-ksql-confluent.ksqldb_
+    - name: _confluent-ksql-confluent.ksqldb_ #_confluent-ksql-<namespace>.<ksql_cluster_name>_
       patternType: PREFIXED
       resourceType: Topic
     role: ResourceOwner
@@ -83,7 +83,7 @@ items:
     name: internal-schemaregistry-0
   spec:
     clustersScopeByIds:
-      schemaRegistryClusterId: id_schemaregistry_confluent  # id_schemaregistry.confluent
+      schemaRegistryClusterId: id_schemaregistry_confluent  # id_<sr-name>.<namespace>
     principal:
       name: sr
       type: user
@@ -100,10 +100,10 @@ items:
     - name: _confluent-license
       patternType: LITERAL
       resourceType: Topic
-    - name: _schemas_schemaregistry_confluent # _schemas_schemaregistry.confluent
+    - name: _schemas_schemaregistry_confluent # _schemas_<sr-name>.<namespace>
       patternType: LITERAL
       resourceType: Topic
-    - name: id_schemaregistry_confluent # id_schemaregistry.confluent
+    - name: id_schemaregistry_confluent # id_<sr-name>.<namespace>
       patternType: LITERAL
       resourceType: Group
     role: ResourceOwner
