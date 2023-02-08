@@ -75,23 +75,38 @@ spec:
         {{- end }}
 
 ---
-# apiVersion: v1
-# kind: Pod
-# metadata:
-#   creationTimestamp: null
-#   labels:
-#     run: testbox
-#   name: testbox
-#   namespace: confluent  
-# spec:
-#   containers:
-#   - image: confluentinc/cp-server:7.3.0
-#     name: testbox
-#     command: ["/bin/sleep", "3650d"]
-#     resources: {}
-#   dnsPolicy: ClusterFirst
-#   restartPolicy: Never
-# status: {} 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: testbox
+  name: testbox
+  namespace: confluent
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/agent-inject-status: update
+    vault.hashicorp.com/preserve-secret-case: "true"
+    vault.hashicorp.com/role: confluent-operator
+
+    vault.hashicorp.com/agent-inject-secret-connect-bearer: secret/connect/bearer.txt
+    vault.hashicorp.com/secret-volume-path-connect-bearer: /vault/secrets
+    vault.hashicorp.com/agent-inject-file-connect-bearer: bearer.txt # this are mandatory name
+    vault.hashicorp.com/agent-inject-template-connect-bearer: |
+      {{- with secret "secret/connect/bearer.txt" -}}
+      {{ .Data.data.bearer | base64Decode }}
+      {{- end }}  
+spec:
+  serviceAccountName: confluent-sa
+  containers:
+  - image: confluentinc/cp-server:7.3.0
+    name: testbox
+    command: ["/bin/sleep", "3650d"]
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+status: {} 
+
 
 ---
 apiVersion: platform.confluent.io/v1beta1
@@ -531,6 +546,7 @@ spec:
         {{ .Data.data.plainjaas | base64Decode }}
         {{- end }}
       vault.hashicorp.com/agent-inject-secret-connect-bearer: secret/connect/bearer.txt
+      vault.hashicorp.com/secret-volume-path-connect-bearer: /vault/secrets
       vault.hashicorp.com/agent-inject-file-connect-bearer: bearer.txt # this are mandatory name
       vault.hashicorp.com/agent-inject-template-connect-bearer: |
         {{- with secret "secret/connect/bearer.txt" -}}

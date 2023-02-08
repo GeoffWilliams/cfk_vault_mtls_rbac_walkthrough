@@ -1,0 +1,68 @@
+kind: Deployment
+serviceAccount:
+  create: false
+  name: confluent-sa
+pod:
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/preserve-secret-case: "true"
+    vault.hashicorp.com/role: confluent-operator
+    vault.hashicorp.com/agent-inject-status: update
+
+    vault.hashicorp.com/agent-inject-file-bearer.txt: bearer.txt
+    vault.hashicorp.com/agent-inject-file-c3bearer: bearer.txt
+    vault.hashicorp.com/agent-inject-file-connectbearer: bearer.txt
+    # vault.hashicorp.com/agent-inject-file-fullchain.pem: fullchain.pem
+    vault.hashicorp.com/agent-inject-file-krpbearer: bearer.txt
+    vault.hashicorp.com/agent-inject-file-ksqldbbearer: bearer.txt
+    vault.hashicorp.com/agent-inject-file-privkey.pem: privkey.pem
+    vault.hashicorp.com/agent-inject-file-srbearer: bearer.txt
+    vault.hashicorp.com/agent-inject-secret-bearer.txt: secret/kafka/bearer.txt
+    vault.hashicorp.com/agent-inject-secret-c3bearer: secret/controlcenter/bearer.txt
+    vault.hashicorp.com/agent-inject-secret-connectbearer: secret/connect/bearer.txt
+    # vault.hashicorp.com/agent-inject-secret-fullchain.pem: secret/kafka/fullchain.pem
+    vault.hashicorp.com/agent-inject-secret-krpbearer: /secret/kafka/bearer.txt
+    vault.hashicorp.com/agent-inject-secret-ksqldbbearer: secret/ksqldb/bearer.txt
+    # vault.hashicorp.com/agent-inject-secret-privkey.pem: secret/kafka/privkey.pem
+    vault.hashicorp.com/agent-inject-secret-srbearer: secret/schemaregistry/bearer.txt
+
+    vault.hashicorp.com/agent-inject-template-bearer.txt: |-
+      {{- with secret "secret/kafka/bearer.txt" -}}
+      {{ .Data.data.bearer }}
+      {{- end }}
+    vault.hashicorp.com/agent-inject-template-c3bearer: |-
+      {{- with secret "secret/controlcenter/bearer.txt" -}}
+      {{ .Data.data.bearer }}
+      {{- end }}
+    vault.hashicorp.com/agent-inject-template-connectbearer: |-
+      {{- with secret "secret/connect/bearer.txt" -}}
+      {{ .Data.data.bearer }}
+      {{- end }}
+    # vault.hashicorp.com/agent-inject-template-fullchain.pem: |-
+    #   {{- with secret "secret/kafka/fullchain.pem" -}}
+    #   {{ .Data.data.data }}
+    #   {{- end }}
+    vault.hashicorp.com/agent-inject-template-krpbearer: |-
+      {{- with secret "/secret/kafka/bearer.txt" -}}
+      {{ .Data.data.bearer }}
+      {{- end }}
+    vault.hashicorp.com/agent-inject-template-ksqldbbearer: |-
+      {{- with secret "secret/ksqldb/bearer.txt" -}}
+      {{ .Data.data.bearer }}
+      {{- end }}
+    # vault.hashicorp.com/agent-inject-template-privkey.pem: |-
+    #   {{- with secret "secret/kafka/privkey.pem" -}}
+    #   {{ .Data.data.data }}
+    #   {{- end }}
+    vault.hashicorp.com/agent-inject-template-srbearer: |-
+      {{- with secret "secret/schemaregistry/bearer.txt" -}}
+      {{ .Data.data.bearer }}
+      {{- end }}
+    vault.hashicorp.com/secret-volume-path-bearer.txt: /vault/secrets
+    vault.hashicorp.com/secret-volume-path-c3bearer: /vault/secrets/c3
+    vault.hashicorp.com/secret-volume-path-connectbearer: /vault/secrets/connect
+    # vault.hashicorp.com/secret-volume-path-fullchain.pem: /vault/secrets
+    vault.hashicorp.com/secret-volume-path-krpbearer: /vault/secrets/kafkarestproxy
+    vault.hashicorp.com/secret-volume-path-ksqldbbearer: /vault/secrets/ksqldb
+    # vault.hashicorp.com/secret-volume-path-privkey.pem: /vault/secrets
+    vault.hashicorp.com/secret-volume-path-srbearer: /vault/secrets/schemaregistry
