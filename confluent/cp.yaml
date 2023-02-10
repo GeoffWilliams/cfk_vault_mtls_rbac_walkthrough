@@ -99,7 +99,7 @@ spec:
 # spec:
 #   serviceAccountName: confluent-sa
 #   containers:
-#   - image: confluentinc/cp-server:7.3.0
+#   - image: confluentinc/cp-server:7.3.1
 #     name: testbox
 #     command: ["/bin/sleep", "3650d"]
 #     resources: {}
@@ -283,11 +283,11 @@ spec:
   replicas: 2
   image:
     application: confluentinc/cp-server-connect:7.3.0
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   tls:
     directoryPathInContainer: /vault/secrets
-  license:
-    directoryPathInContainer: /vault/secrets
+  # license:
+  #   directoryPathInContainer: /vault/secrets
   authorization:
     type: rbac
   podTemplate:
@@ -354,10 +354,12 @@ spec:
           directoryPathInContainer: /vault/secrets
       tls:
         enabled: true
-    # schemaRegistry:
-    #   url: https://schemaregistry.confluent.svc.cluster.local:8081
-    #   tls:
-    #     enabled: true
+    schemaRegistry:
+      url: https://schemaregistry.confluent.svc.cluster.local:8081
+      authentication:
+        type: mtls
+      tls:
+        enabled: true
 
        
 ---
@@ -371,11 +373,11 @@ spec:
   replicas: 2
   image:
     application: confluentinc/cp-schema-registry:7.3.0
-    init: confluentinc/confluent-init-container:2.5.0
+    init: confluentinc/confluent-init-container:2.5.1
   tls:
     directoryPathInContainer: /vault/secrets
-  license:
-    directoryPathInContainer: /vault/secrets
+  # license:
+  #   directoryPathInContainer: /vault/secrets
   authorization:
     type: rbac
   podTemplate:
@@ -652,8 +654,11 @@ spec:
           enabled: true
     schemaRegistry:
       url: https://schemaregistry.confluent.svc.cluster.local:8081
+      authentication:
+        type: mtls
       tls:
         enabled: true
+
   podTemplate:
     serviceAccountName: confluent-sa
     annotations:
