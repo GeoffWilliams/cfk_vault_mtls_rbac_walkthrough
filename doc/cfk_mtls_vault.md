@@ -158,6 +158,14 @@ password: kafka-secret
 
 confluent iam rbac role list
 
+### rbac audit logs
+wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+mv jq-linux64 jq
+chmod +x jq
+
+denied access
+kafka-console-consumer --bootstrap-server kafka.confluent.svc.cluster.local:9071 --consumer.config client.properties --topic confluent-audit-log-events | ./jq 'select(.data.authorizationInfo.granted == false)'
+
 # Print the rbac roles
 confluent iam rbac role list -o json | jq -r .[].name
 Operator
@@ -178,3 +186,13 @@ confluent iam rbac role-binding list --kafka-cluster-id ftUNS_zASHSV4-6dgJpnhA -
 
 ## Schema registry
 kubectl exec -ti schemaregistry-0 -- curl -k https://testadmin:testadmin@localhost:8081
+
+
+## Control center
+kubectl port-forward service/controlcenter 9021:9021
+https://localhost:9021 in browser
+
+testadmin:testadmin
+kafka:kafka-secret
+
+kubectl exec -ti controlcenter-0 -- bash

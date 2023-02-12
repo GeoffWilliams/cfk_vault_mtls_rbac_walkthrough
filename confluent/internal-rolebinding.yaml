@@ -83,7 +83,7 @@ items:
     name: internal-schemaregistry-0
   spec:
     clustersScopeByIds:
-      schemaRegistryClusterId: id_schemaregistry_confluent  # id_<sr-name>.<namespace>
+      schemaRegistryClusterId: id_schemaregistry.confluent  # id_<sr-name>.<namespace>
     principal:
       name: sr
       type: user
@@ -97,7 +97,7 @@ items:
       name: sr
       type: user
     resourcePatterns:
-    - name: _confluent-license
+    - name: _confluent-command
       patternType: LITERAL
       resourceType: Topic
     - name: _schemas_schemaregistry_confluent # _schemas_<sr-name>.<namespace>
