@@ -282,7 +282,7 @@ metadata:
 spec:
   replicas: 2
   image:
-    application: confluentinc/cp-server-connect:7.3.0
+    application: confluentinc/cp-server-connect:7.3.1
     init: confluentinc/confluent-init-container:2.5.1
   tls:
     directoryPathInContainer: /vault/secrets
@@ -372,12 +372,12 @@ metadata:
 spec:
   replicas: 2
   image:
-    application: confluentinc/cp-schema-registry:7.3.0
+    application: confluentinc/cp-schema-registry:7.3.1
     init: confluentinc/confluent-init-container:2.5.1
   tls:
     directoryPathInContainer: /vault/secrets
-  # license:
-  #   directoryPathInContainer: /vault/secrets
+  license:
+    directoryPathInContainer: /vault/secrets
   authorization:
     type: rbac
   podTemplate:

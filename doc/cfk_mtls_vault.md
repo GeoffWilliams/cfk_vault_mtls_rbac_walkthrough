@@ -124,3 +124,57 @@ kubectl get crd
 kubectl describe crd zookeepers.platform.confluent.io
 kubectl get zookeepers.platform.confluent.io
 kubectl describe zookeepers.platform.confluent.io
+
+# testing
+
+## Kafka ACLs
+
+cat <<EOF > client.properties
+bootstrap.servers=kafka.confluent.svc.cluster.local:9071
+security.protocol=SSL
+ssl.truststore.location=/vault/secrets/truststore.jks
+ssl.truststore.password=mystorepassword
+ssl.keystore.location=/vault/secrets/keystore.jks
+ssl.keystore.password=mystorepassword
+ssl.key.password=mystorepassword
+EOF
+
+kafka-acls --command-config client.properties --bootstrap-server kafka.confluent.svc.cluster.local:9071 --list
+
+kafka-topics --command-config client.properties --bootstrap-server kafka.confluent.svc.cluster.local:9071 --list
+
+
+
+## Kafka RBAC
+Use confluent cli - reference https://docs.confluent.io/confluent-cli/current/command-reference/confluent_login.html#flags
+
+/etc/hosts
+127.0.0.1 kafka kafka-0.kafka.confluent-dev.svc.cluster.local kafka-0
+
+kubectl port-forward service/kafka 8090:8090
+confluent login --url https://kafka:8090 --ca-cert-path generated/cacerts.pem --save
+username: kafka
+password: kafka-secret
+
+confluent iam rbac role list
+
+# Print the rbac roles
+confluent iam rbac role list -o json | jq -r .[].name
+Operator
+ResourceOwner
+DeveloperManage
+DeveloperRead
+DeveloperWrite
+AuditAdmin
+ClusterAdmin
+SecurityAdmin
+SystemAdmin
+UserAdmin
+
+# get the cluster id
+confluent cluster describe --url https://kafka:8090 --ca-cert-path generated/cacerts.pem | awk '/kafka-cluster/ { print $3}'
+confluent iam rbac role-binding list --kafka-cluster-id ftUNS_zASHSV4-6dgJpnhA --role DeveloperRead --resource Topic:_confluent-license
+
+
+## Schema registry
+kubectl exec -ti schemaregistry-0 -- curl -k https://testadmin:testadmin@localhost:8081
