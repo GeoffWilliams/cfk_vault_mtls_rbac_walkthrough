@@ -220,7 +220,7 @@ EOF
 127.0.0.1 ksql-server broker ksql
 
 
-ksql --config-file ksql-cli.properties --user ksqldb-admin --password test123 https://ksql:8088
+ksql --config-file ksql-cli.properties --user ksql --password ksql-secret https://ksql:8088
 
 
 
