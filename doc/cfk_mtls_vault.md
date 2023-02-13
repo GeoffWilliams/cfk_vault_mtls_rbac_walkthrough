@@ -180,6 +180,8 @@ SystemAdmin
 UserAdmin
 
 # get the cluster id
+kubectl describe kafkarestclasses.platform.confluent.io default |grep "Kafka Cluster ID"
+
 confluent cluster describe --url https://kafka:8090 --ca-cert-path generated/cacerts.pem | awk '/kafka-cluster/ { print $3}'
 confluent iam rbac role-binding list --kafka-cluster-id hRRbitJaQZuYbGxuvZ29mA --role DeveloperRead --resource Topic:_confluent-license
 
@@ -215,3 +217,14 @@ EOF
 
 
 ksql --config-file ksql-cli.properties --user ksqldb-admin --password test123 https://ksql:8088
+
+
+
+# secret for kafka rest
+kubectl -n confluent create secret generic rest-credential --from-file=bearer.txt=credentials/rbac/kafkarestclass/bearer.txt
+
+
+# delete all rbac role bindings
+for RULE in $(kubectl get confluentrolebindings.platform.confluent.io --no-headers | awk '{print $1}') ; do 
+  kubectl delete confluentrolebindings.platform.confluent.io $RULE
+done

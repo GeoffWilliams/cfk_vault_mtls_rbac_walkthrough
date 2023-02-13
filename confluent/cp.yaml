@@ -405,9 +405,9 @@ spec:
         {{- with secret "secret/truststore.jks" -}}
         {{ .Data.data.truststore | base64Decode }}
         {{- end }}
-      vault.hashicorp.com/agent-inject-secret-connect-bearer: secret/schemaregistry/bearer.txt
-      vault.hashicorp.com/agent-inject-file-connect-bearer: bearer.txt # this are mandatory name
-      vault.hashicorp.com/agent-inject-template-connect-bearer: |
+      vault.hashicorp.com/agent-inject-secret-sr-bearer: secret/schemaregistry/bearer.txt
+      vault.hashicorp.com/agent-inject-file-sr-bearer: bearer.txt # this are mandatory name
+      vault.hashicorp.com/agent-inject-template-sr-bearer: |
         {{- with secret "secret/schemaregistry/bearer.txt" -}}
         {{ .Data.data.bearer | base64Decode }}
         {{- end }}
@@ -445,7 +445,7 @@ spec:
       authentication:
         type: bearer
         bearer:
-          directoryPathInContainer: /vault/secrets/
+          directoryPathInContainer: /vault/secrets
       tls:
         enabled: true
      
