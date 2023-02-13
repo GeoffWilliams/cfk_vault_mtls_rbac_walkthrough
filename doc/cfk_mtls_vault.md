@@ -109,6 +109,10 @@ vault kv put secret/github \
     accesstoken="<your-GitHub-access-token>"
 
 
+read data from vault
+vault kv get -format=json -field=data secret/ksqldb/bearer.txt
+
+
 # 5. setup fake ldap server
 helm upgrade --install -f confluent-kubernetes-examples/assets/openldap/ldaps-rbac.yaml test-ldap confluent-kubernetes-examples/assets/openldap -n confluent
 

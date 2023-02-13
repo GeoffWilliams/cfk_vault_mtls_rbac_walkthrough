@@ -312,6 +312,7 @@ spec:
         {{- with secret "secret/truststore.jks" -}}
         {{ .Data.data.truststore | base64Decode }}
         {{- end }}
+      vault.hashicorp.com/secret-volume-path-connect-bearer: /vault/secrets/connect
       vault.hashicorp.com/agent-inject-secret-connect-bearer: secret/connect/bearer.txt
       vault.hashicorp.com/agent-inject-file-connect-bearer: bearer.txt # this are mandatory name
       vault.hashicorp.com/agent-inject-template-connect-bearer: |
@@ -352,7 +353,7 @@ spec:
       authentication:
         type: bearer
         bearer:
-          directoryPathInContainer: /vault/secrets
+          directoryPathInContainer: /vault/secrets/connect
       tls:
         enabled: true
     schemaRegistry:
@@ -405,6 +406,7 @@ spec:
         {{- with secret "secret/truststore.jks" -}}
         {{ .Data.data.truststore | base64Decode }}
         {{- end }}
+      vault.hashicorp.com/secret-volume-path-sr-bearer: /vault/secrets/schemaregistry
       vault.hashicorp.com/agent-inject-secret-sr-bearer: secret/schemaregistry/bearer.txt
       vault.hashicorp.com/agent-inject-file-sr-bearer: bearer.txt # this are mandatory name
       vault.hashicorp.com/agent-inject-template-sr-bearer: |
@@ -445,7 +447,7 @@ spec:
       authentication:
         type: bearer
         bearer:
-          directoryPathInContainer: /vault/secrets
+          directoryPathInContainer: /vault/secrets/schemaregistry
       tls:
         enabled: true
      
@@ -492,6 +494,7 @@ spec:
         {{- with secret "secret/truststore.jks" -}}
         {{ .Data.data.truststore | base64Decode }}
         {{- end }}
+      vault.hashicorp.com/secret-volume-path-ksqldb-bearer: /vault/secrets/ksqldb
       vault.hashicorp.com/agent-inject-secret-ksqldb-bearer: secret/ksqldb/bearer.txt
       vault.hashicorp.com/agent-inject-file-ksqldb-bearer: bearer.txt # this are mandatory name
       vault.hashicorp.com/agent-inject-template-ksqldb-bearer: |
@@ -529,8 +532,6 @@ spec:
       url: https://schemaregistry.confluent.svc.cluster.local:8081
       tls:
         enabled: true
-
-
     mds:
       endpoint: https://kafka.confluent.svc.cluster.local:8090
       tokenKeyPair:
@@ -538,7 +539,7 @@ spec:
       authentication:
         type: bearer
         bearer:
-          directoryPathInContainer: /vault/secrets
+          directoryPathInContainer: /vault/secrets/ksqldb
       tls:
         enabled: true
 
@@ -710,6 +711,7 @@ spec:
         {{- with secret "secret/truststore.jks" -}}
         {{ .Data.data.truststore | base64Decode }}
         {{- end }}
+      vault.hashicorp.com/secret-volume-path-controlcenter-bearer: /vault/secrets/controlcenter
       vault.hashicorp.com/agent-inject-secret-controlcenter-bearer: secret/controlcenter/bearer.txt
       vault.hashicorp.com/agent-inject-file-controlcenter-bearer: bearer.txt # this are mandatory name
       vault.hashicorp.com/agent-inject-template-controlcenter-bearer: |
@@ -764,7 +766,7 @@ spec:
       authentication:
         type: bearer
         bearer:
-          directoryPathInContainer: /vault/secrets
+          directoryPathInContainer: /vault/secrets/controlcenter
       tls:
         enabled: true
 
