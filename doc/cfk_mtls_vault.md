@@ -159,8 +159,8 @@ password: kafka-secret
 confluent iam rbac role list
 
 ### rbac audit logs
-wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-mv jq-linux64 jq
+cd /tmp
+wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O jq
 chmod +x jq
 
 denied access
@@ -181,12 +181,12 @@ UserAdmin
 
 # get the cluster id
 confluent cluster describe --url https://kafka:8090 --ca-cert-path generated/cacerts.pem | awk '/kafka-cluster/ { print $3}'
-confluent iam rbac role-binding list --kafka-cluster-id ftUNS_zASHSV4-6dgJpnhA --role DeveloperRead --resource Topic:_confluent-license
+confluent iam rbac role-binding list --kafka-cluster-id hRRbitJaQZuYbGxuvZ29mA --role DeveloperRead --resource Topic:_confluent-license
 
 
 ## Schema registry
 kubectl exec -ti schemaregistry-0 -- curl -k https://testadmin:testadmin@localhost:8081
-
+kubectl exec -ti schemaregistry-0 -- curl -k https://sr:sr-secret@localhost:8081/permissions
 
 ## Control center
 kubectl port-forward service/controlcenter 9021:9021
@@ -196,3 +196,22 @@ testadmin:testadmin
 kafka:kafka-secret
 
 kubectl exec -ti controlcenter-0 -- bash
+
+
+## KSQL
+kubectl port-forward service/ksqldb 8088:8088
+
+cat <<EOF > ksql-cli.properties
+ssl.truststore.location=generated/truststore.jks
+ssl.truststore.password=mystorepassword
+ssl.keystore.location=generated/ksqldb-keystore.jks
+ssl.keystore.password=mystorepassword
+ssl.key.password=mystorepassword
+ssl.keystore.alias=testservice
+EOF
+
+/etc/hosts
+127.0.0.1 ksql-server broker ksql
+
+
+ksql --config-file ksql-cli.properties --user ksqldb-admin --password test123 https://ksql:8088
