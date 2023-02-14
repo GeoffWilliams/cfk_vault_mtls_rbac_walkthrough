@@ -2,6 +2,7 @@
   "CN": "sr",
   "hosts": [
     "sr",
+    "schemaregistry",
     "schemaregistry.mydomain.example",
     "schemaregistry.confluent.svc.cluster.local"
   ],

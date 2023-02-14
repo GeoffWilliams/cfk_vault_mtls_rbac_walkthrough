@@ -105,9 +105,6 @@ helm upgrade -f confluent/values.yaml --install confluent-operator confluentinc/
 
 
 # 5. Load TLS data into vault
-vault kv put secret/github \
-    accesstoken="<your-GitHub-access-token>"
-
 
 read data from vault
 vault kv get -format=json -field=data secret/ksqldb/bearer.txt

@@ -1,0 +1,345 @@
+---
+# rolebinding `testadmin-rb` allows `testadmin` to see kafkaCluster
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+  role: ClusterAdmin
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+# rolebinding `testadmin-rb-sr` allows `testadmin` to see schemaregistry information
+# `schemaRegistryCllusterId` pattern: `id_<schemaregistry.name>_<namespace>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-sr
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+  clustersScopeByIds:
+    schemaRegistryClusterId: id_schemaregistry_confluent
+  role: SystemAdmin
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+# rolebinding `testadmin-rb-connect` allows `testadmin` to see connect cluster
+# `connectClusterId` pattern: `<namespace>.<connect.name>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-connect
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+  clustersScopeByIds:
+    connectClusterId: confluent.connect
+  role: SystemAdmin
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+# rolebinding `testadmin-rb-ksql` allows `testadmin` to see ksqldb cluster
+# `ksqlClusterId` pattern: `<namespace>.<ksqldb.name>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+  clustersScopeByIds:
+    ksqlClusterId: confluent.ksqldb_
+  role: ResourceOwner
+  resourcePatterns:
+    - name: ksql-cluster
+      patternType: LITERAL
+      resourceType: KsqlCluster
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+# rolebinding `testadmin-rb-ksql` allows `testadmin` to see ksqldb cluster
+# `ksqlClusterId` pattern: `<namespace>.<ksqldb.name>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-2
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: ksql
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: DeveloperRead
+  resourcePatterns:
+    - name: "*"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-3
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: DeveloperRead
+  resourcePatterns:
+    - name: "*"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-4
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: DeveloperWrite
+  resourcePatterns:
+    - name: "*"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-4
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: DeveloperWrite
+  resourcePatterns:
+    - name: "*"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-5
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: DeveloperManage
+  resourcePatterns:
+    - name: "*"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-6
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: ksql
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: DeveloperManage
+  resourcePatterns:
+    - name: "*"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-7
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: ksql
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: DeveloperWrite
+  resourcePatterns:
+    - name: "*"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-8
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: ResourceOwner
+  resourcePatterns:
+    - name: "testtopic"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-9
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: ksql
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: ResourceOwner
+  resourcePatterns:
+    - name: "testtopic"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+
+
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-10
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: tesadmin
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: ResourceOwner
+  resourcePatterns:
+    - name: "confluent-audit-log-events"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+
+
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-11
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: ksql
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: ResourceOwner
+  resourcePatterns:
+    - name: "confluent-audit-log-events"
+      patternType: LITERAL
+      resourceType: Topic
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+---
+
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-makesuper
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: testadmin
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: SystemAdmin
+    #  resourcePatterns:
+    #- name: "all"
+    #  patternType: LITERAL
+    #  resourceType: All
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: testadmin-rb-ksql-makesuper-super
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: ksql
+      #clustersScopeByIds:
+      #ksqlClusterId: confluent.ksqldb_
+  role: SystemAdmin
+    #  resourcePatterns:
+    #- name: "all"
+    #  patternType: LITERAL
+    #  resourceType: All
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: default
+

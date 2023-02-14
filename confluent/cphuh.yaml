@@ -658,27 +658,27 @@ spec:
       vault.hashicorp.com/role: confluent-operator
   dependencies:
     kafka:
-      bootstrapEndpoint: kafka:9071
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
       authentication:
         type: mtls
       tls:
         enabled: true
     schemaRegistry:
-      url: https://schemaregistry:8081
+      url: https://schemaregistry.confluent.svc.cluster.local:8081
       tls:
         enabled: true
     ksqldb:
     - name: ksql
-      url: https://ksqldb:8088
+      url: https://ksqldb.confluent.svc.cluster.local:8088
       tls:
         enabled: true
     connect:
     - name: connect
-      url:  https://connect:8083
+      url:  https://connect.confluent.svc.cluster.local:8083
       tls:
         enabled: true
     mds:
-      endpoint: https://kafka:8090
+      endpoint: https://kafka.confluent.svc.cluster.local:8090
       tokenKeyPair:
         directoryPathInContainer: /vault/secrets
       authentication:
