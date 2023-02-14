@@ -194,10 +194,18 @@ confluent iam rbac role-binding list --kafka-cluster-id hRRbitJaQZuYbGxuvZ29mA -
 kubectl exec -ti schemaregistry-0 -- curl -k https://testadmin:testadmin@localhost:8081
 kubectl exec -ti schemaregistry-0 -- curl -k https://sr:sr-secret@localhost:8081/permissions
 
+## Connect
+kubectl exec -ti connect-0  -- curl -k https://connect:connect-secret@localhost:8083/connectors
+
 ## Control center
 kubectl port-forward service/controlcenter 9021:9021
-https://localhost:9021 in browser
+kubectl exec -ti controlcenter-0 -- curl -k https://c3:c3-secret@localhost:9021/2.0/clusters/connect
 
+
+in browser
+https://localhost:9021 
+
+c3:c3-secret
 testadmin:testadmin
 kafka:kafka-secret
 

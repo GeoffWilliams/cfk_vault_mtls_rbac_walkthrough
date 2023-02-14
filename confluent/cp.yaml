@@ -123,6 +123,7 @@ spec:
     server: 
       - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer 
       - confluent.authorizer.access.rule.providers=ZK_ACL,CONFLUENT
+      # - confluent.schema.registry.url=https://schemaregistry.confluent.svc.cluster.local:8081        
   tls:
     directoryPathInContainer: /vault/secrets
   license:
@@ -138,6 +139,11 @@ spec:
         enabled: true
       tokenKeyPair:
         directoryPathInContainer: /vault/secrets
+      externalAccess:
+        type: loadBalancer
+        loadBalancer:
+          domain: mydomain.example
+          prefix: rb-mds        
       provider:
         type: ldap
         ldap:
@@ -242,6 +248,12 @@ spec:
         type: mtls
         principalMappingRules:
           - RULE:.*CN[\s]?=[\s]?([a-zA-Z0-9.]*)?.*/$1/
+      externalAccess:
+        type: loadBalancer
+        loadBalancer:
+          domain: mydomain.example
+          brokerPrefix: rb
+          bootstrapPrefix: rb          
       tls:
         enabled: true
         # Will use the certificates in the parent secretRef tls-kafka
@@ -291,6 +303,11 @@ spec:
   #   directoryPathInContainer: /vault/secrets
   authorization:
     type: rbac
+  externalAccess:
+    type: loadBalancer
+    loadBalancer:
+      domain: mydomain.example
+      prefix: rb-connect    
   podTemplate:
     serviceAccountName: confluent-sa
     annotations:
@@ -380,6 +397,11 @@ spec:
     directoryPathInContainer: /vault/secrets
   authorization:
     type: rbac
+  externalAccess:
+    type: loadBalancer
+    loadBalancer:
+      domain: mydomain.example
+      prefix: rb-sr    
   configOverrides:
     server:
     - confluent.license.topic=_confluent-command  
@@ -467,10 +489,18 @@ spec:
   dataVolumeCapacity: 10Gi
   authorization:
     type: rbac
+  externalAccess:
+    type: loadBalancer
+    loadBalancer:
+      domain: mydomain.example
+      prefix: rb-ksql    
   tls:
     directoryPathInContainer: /vault/secrets
   license:
     directoryPathInContainer: /vault/secrets
+  # configOverrides:
+  #   server:
+  #     - ksql.schema.registry.url=https://schemaregistry.confluent.svc.cluster.local:8081  
   podTemplate:
     serviceAccountName: confluent-sa
     annotations:
@@ -552,12 +582,26 @@ metadata:
   #   platform.confluent.io/disable-internal-rolebindings-creation: "true"
 spec:
   replicas: 1
+  podTemplate:
+    probe:
+      liveness:
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 500 
   image:
     application: confluentinc/cp-enterprise-control-center:7.3.1
     init: confluentinc/confluent-init-container:2.5.1
   dataVolumeCapacity: 10Gi
   authorization:
     type: rbac
+  externalAccess:
+    type: loadBalancer
+    loadBalancer:
+      domain: mydomain.example
+      prefix: rb-c3    
+  configOverrides:
+    log4j:
+      - log4j.rootLogger=DEBUG, stdout      
   tls:
     directoryPathInContainer: /vault/secrets
   license:
@@ -585,7 +629,7 @@ spec:
         {{- with secret "secret/truststore.jks" -}}
         {{ .Data.data.truststore | base64Decode }}
         {{- end }}
-      vault.hashicorp.com/secret-volume-path-controlcenter-bearer: /vault/secrets/controlcenter
+      vault.hashicorp.com/secret-volume-path-controlcenter-bearer: /vault/secrets/c3
       vault.hashicorp.com/agent-inject-secret-controlcenter-bearer: secret/controlcenter/bearer.txt
       vault.hashicorp.com/agent-inject-file-controlcenter-bearer: bearer.txt # this are mandatory name
       vault.hashicorp.com/agent-inject-template-controlcenter-bearer: |
@@ -640,7 +684,7 @@ spec:
       authentication:
         type: bearer
         bearer:
-          directoryPathInContainer: /vault/secrets/controlcenter
+          directoryPathInContainer: /vault/secrets/c3
       tls:
         enabled: true
 
@@ -656,3 +700,59 @@ spec:
       type: bearer
       bearer:
         secretRef: rest-credential
+
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: KafkaRestProxy
+metadata:
+  name: kafkarestproxy
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-kafka-rest:7.3.1
+    init: confluentinc/confluent-init-container:2.5.1
+  tls:
+    directoryPathInContainer: /vault/secrets
+  externalAccess:
+    type: loadBalancer
+    loadBalancer:
+      domain: mydomain.example
+      prefix: krp
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: mtls
+      tls:
+        enabled: true
+  podTemplate:
+    serviceAccountName: confluent-sa
+    annotations:
+      vault.hashicorp.com/agent-inject: "true"
+      vault.hashicorp.com/agent-inject-status: update
+      vault.hashicorp.com/preserve-secret-case: "true"
+      vault.hashicorp.com/agent-inject-secret-jksPassword.txt: secret/jksPassword.txt
+      vault.hashicorp.com/agent-inject-template-jksPassword.txt: |
+        {{- with secret "secret/jksPassword.txt" -}}
+        {{ .Data.data.password }}
+        {{- end }}
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/kafkarestproxy-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/kafkarestproxy-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}   
+      vault.hashicorp.com/agent-inject-secret-truststore.jks: secret/truststore.jks
+      vault.hashicorp.com/agent-inject-template-truststore.jks: |
+        {{- with secret "secret/truststore.jks" -}}
+        {{ .Data.data.truststore | base64Decode }}
+        {{- end }}
+      vault.hashicorp.com/agent-inject-secret-license: secret/license.txt
+      vault.hashicorp.com/agent-inject-file-license: license.txt
+      vault.hashicorp.com/agent-inject-template-license: |
+        {{- with secret "secret/license.txt" -}}
+        {{ .Data.data.license | base64Decode }}
+        {{- end }}
+      vault.hashicorp.com/role: confluent-operator
