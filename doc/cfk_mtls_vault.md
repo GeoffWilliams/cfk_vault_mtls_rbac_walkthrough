@@ -237,3 +237,23 @@ kubectl -n confluent create secret generic rest-credential --from-file=bearer.tx
 for RULE in $(kubectl get confluentrolebindings.platform.confluent.io --no-headers | awk '{print $1}') ; do 
   kubectl delete confluentrolebindings.platform.confluent.io $RULE
 done
+
+
+
+
+# ksql 
+-- table with declared columns: 
+CREATE TABLE users (
+     id BIGINT PRIMARY KEY,
+     usertimestamp BIGINT,
+     gender VARCHAR,
+     region_id VARCHAR
+   ) WITH (
+     KAFKA_TOPIC = 'my-users-topic', 
+     VALUE_FORMAT = 'JSON',
+     PARTITIONS= 1
+   );
+
+INSERT INTO users VALUES (1,1,'m','a');
+CREATE TABLE QUERYABLE_USERS AS SELECT * FROM USERS;
+SELECT * FROM QUERYABLE_USERS;
