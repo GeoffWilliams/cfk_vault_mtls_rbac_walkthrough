@@ -1,6 +1,6 @@
 # CFK MTLS VAULT RBAC + K3D/K3S
 
-## Prequestites
+## Prerequisites
 * K3D
 * K3S
 * Openssl
@@ -11,6 +11,7 @@
 * confluent cli
 * docker
 * Big laptop to run this on. Recommend at least 32GB RAM and at least 64GB swap
+* cfssl (cloudflare ssl) `apt install golang-cfssl`
 * [confluent-kubernetes-examples](https://github.com/confluentinc/confluent-kubernetes-examples/) symlinked, eg:
   ```
   # adjust as needed
@@ -701,3 +702,15 @@ kubectl exec -it vault-0 --namespace hashicorp -- vault kv get -format=json -fie
 
 > **Note**
 > For example, adjust as needed
+
+### How to debug kubernetes DNS
+
+> **Note**
+> Kubernetes uses coredns, we can gain access to run queries against coredns with a dns lookup enabled pod
+
+Docs: https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
+
+```
+kubectl apply -f dns-utils.yaml
+kubectl exec -i -t dnsutils -n default  -- nslookup kafka.confluent.svc.cluster.local
+```
