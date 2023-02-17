@@ -2,7 +2,7 @@
   "CN": "kafka",
   "hosts": [
     "kafka",
-    "*.my.domain",
+    "*.mydomain.example",
     "kafka.confluent.svc.cluster.local",
     "*.kafka.confluent.svc.cluster.local",
     "kafka.source.svc.cluster.local",

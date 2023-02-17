@@ -18,6 +18,16 @@ spec:
     directoryPathInContainer: /vault/secrets
   podTemplate:
     serviceAccountName: confluent-sa
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - zookeeper
+            topologyKey: kubernetes.io/hostname    
     annotations:
       vault.hashicorp.com/role: confluent-operator
       vault.hashicorp.com/agent-inject: "true"
@@ -164,7 +174,18 @@ spec:
             userSearchBase: dc=test,dc=com
   podTemplate:
     serviceAccountName: confluent-sa
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - kafka
+            topologyKey: kubernetes.io/hostname
     annotations:
+      kafkacluster-manual-roll: "1"
       vault.hashicorp.com/agent-inject: "true"
       vault.hashicorp.com/agent-inject-status: update
       vault.hashicorp.com/preserve-secret-case: "true"
@@ -252,8 +273,8 @@ spec:
         type: loadBalancer
         loadBalancer:
           domain: mydomain.example
-          brokerPrefix: rb
-          bootstrapPrefix: rb          
+          brokerPrefix: kafka-
+          bootstrapPrefix: kafka-         
       tls:
         enabled: true
         # Will use the certificates in the parent secretRef tls-kafka
@@ -307,7 +328,7 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: mydomain.example
-      prefix: rb-connect    
+      prefix: connect
   podTemplate:
     serviceAccountName: confluent-sa
     annotations:
@@ -401,7 +422,7 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: mydomain.example
-      prefix: rb-sr    
+      prefix: sr    
   configOverrides:
     server:
     - confluent.license.topic=_confluent-command  
@@ -493,7 +514,7 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: mydomain.example
-      prefix: rb-ksql    
+      prefix: ksqldb    
   tls:
     directoryPathInContainer: /vault/secrets
   license:
@@ -598,7 +619,7 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: mydomain.example
-      prefix: rb-c3    
+      prefix: controlcenter
   configOverrides:
     log4j:
       - log4j.rootLogger=DEBUG, stdout      
@@ -668,7 +689,7 @@ spec:
       tls:
         enabled: true
     ksqldb:
-    - name: ksql
+    - name: ksqldb
       url: https://ksqldb:8088
       tls:
         enabled: true
@@ -718,7 +739,7 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: mydomain.example
-      prefix: krp
+      prefix: kafkaresproxy
   dependencies:
     kafka:
       bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
