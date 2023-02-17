@@ -11,6 +11,11 @@
 * confluent cli
 * docker
 * Big laptop to run this on. Recommend at least 32GB RAM and at least 64GB swap
+* [confluent-kubernetes-examples](https://github.com/confluentinc/confluent-kubernetes-examples/) symlinked, eg:
+  ```
+  # adjust as needed
+  ln -s ~/research/cfk/confluent-kubernetes-examples/
+  ```
 
 
 ## Cluster setup
