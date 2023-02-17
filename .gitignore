@@ -1,4 +1,4 @@
 test.sh
-/generated
+generated
 pkcs.p12
 confluent-kubernetes-examples
