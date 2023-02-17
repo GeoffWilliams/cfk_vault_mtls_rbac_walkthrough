@@ -1,7 +1,7 @@
 #!/bin/bash
 
 WORKDIR="generated"
-CONFLUENT_SETTINGS_DIR="confluent"
+CONFLUENT_SETTINGS_DIR="cfssl_profiles"
 COMPONENTS="
     zookeeper
     kafka

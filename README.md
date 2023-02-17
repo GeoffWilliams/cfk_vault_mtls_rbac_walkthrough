@@ -100,6 +100,10 @@ helm install vault hashicorp/vault \
 > **Note**
 > One-time task!
 
+> **Note**
+> `cfssl_profiles` in this git repo differ from those in `confluent-kubernetes-examples` - changed SANs
+
+
 ```
 ./create_ca.sh
 ./confluent_certs.sh
