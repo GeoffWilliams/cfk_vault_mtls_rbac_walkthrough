@@ -1,5 +1,15 @@
 # CFK MTLS VAULT RBAC + K3D/K3S
 
+Walkthrough of how to setup:
+
+* Confluent for Kubernetes (CFK)
+* Mutual TLS (mTLS)
+* Role Based Access Control (RBAC)
+
+On K3d/K3s
+
+With testing and troubleshooting hints
+
 ## Prerequisites
 * K3D
 * K3S
