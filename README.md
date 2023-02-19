@@ -708,6 +708,15 @@ kubectl apply -f confluent/controlcenter-testadmin-rolebindings.yaml
 
 This happens when pods get restarted and also seemingly at random or on access. I would like to know the answer to this too. For now the solution seems to be restarting the port-forward or using metallb and real services.
 
+### Whole kafka cluster suddently broke!
+
+Vault seems to die and restart periodicially taking all credentials with it. No idea why. An exercise would be a PV/PVC to stop this from happening.
+
+### Topic data is gone!
+
+No persistant storage is configured so each cluster gets a factory reset. I consider this a feature.
+
+
 ### Test reading a secret back from vault
 
 ```
