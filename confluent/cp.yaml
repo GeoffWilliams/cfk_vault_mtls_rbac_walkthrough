@@ -133,7 +133,12 @@ spec:
     server: 
       - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer 
       - confluent.authorizer.access.rule.providers=ZK_ACL,CONFLUENT
-      # - confluent.schema.registry.url=https://schemaregistry.confluent.svc.cluster.local:8081        
+      
+      # audit authentication logging (eg login/login fail)
+      - confluent.security.event.logger.authentication.enable=true
+
+      # log topic/produce/consume denied
+      - confluent.security.event.router.config={"routes":{"crn:///kafka=*":{"interbroker":{"allowed":"","denied":"confluent-audit-log-events"},"describe":{"allowed":"","denied":"confluent-audit-log-events"},"management":{"allowed":"confluent-audit-log-events","denied":"confluent-audit-log-events"}},"crn:///kafka=*/group=*":{"consume":{"allowed":"","denied":"confluent-audit-log-events"},"describe":{"allowed":"","denied":"confluent-audit-log-events"},"management":{"allowed":"","denied":"confluent-audit-log-events"}},"crn:///kafka=*/topic=*":{"produce":{"allowed":"","denied":"confluent-audit-log-events"},"consume":{"allowed":"","denied":"confluent-audit-log-events"},"describe":{"allowed":"","denied":"confluent-audit-log-events"}}},"destinations":{"topics":{"confluent-audit-log-events":{}}},"default_topics":{"allowed":"confluent-audit-log-events","denied":"confluent-audit-log-events"},"excluded_principals":["User:kafka"]}
   tls:
     directoryPathInContainer: /vault/secrets
   license:
