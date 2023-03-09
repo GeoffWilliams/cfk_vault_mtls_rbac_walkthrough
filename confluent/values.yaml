@@ -9,7 +9,6 @@ pod:
     vault.hashicorp.com/preserve-secret-case: "true"
     vault.hashicorp.com/role: confluent-operator
     vault.hashicorp.com/agent-inject-status: update
-    vault.hashicorp.com/agent-inject: "true"
 
     vault.hashicorp.com/agent-inject-file-bearer.txt: bearer.txt
     vault.hashicorp.com/agent-inject-file-c3bearer: bearer.txt
@@ -27,7 +26,7 @@ pod:
     vault.hashicorp.com/agent-inject-secret-ksqldbbearer: secret/ksqldb/bearer.txt
     # vault.hashicorp.com/agent-inject-secret-privkey.pem: secret/kafka/privkey.pem
     vault.hashicorp.com/agent-inject-secret-srbearer: secret/schemaregistry/bearer.txt
-    vault.hashicorp.com/agent-inject-status: update
+
     vault.hashicorp.com/agent-inject-template-bearer.txt: |-
       {{- with secret "secret/kafka/bearer.txt" -}}
       {{ .Data.data.bearer | base64Decode }}
@@ -60,7 +59,6 @@ pod:
       {{- with secret "secret/schemaregistry/bearer.txt" -}}
       {{ .Data.data.bearer | base64Decode }}
       {{- end }}
-    vault.hashicorp.com/preserve-secret-case: "true"
     vault.hashicorp.com/secret-volume-path-bearer.txt: /vault/secrets
     vault.hashicorp.com/secret-volume-path-c3bearer: /vault/secrets/c3
     vault.hashicorp.com/secret-volume-path-connectbearer: /vault/secrets/connect
