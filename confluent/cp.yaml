@@ -319,7 +319,7 @@ metadata:
   # annotations:
   #   platform.confluent.io/disable-internal-rolebindings-creation: "true"
 spec:
-  replicas: 2
+  replicas: 1
   image:
     application: confluentinc/cp-server-connect:7.3.1
     init: confluentinc/confluent-init-container:2.5.1
@@ -413,7 +413,7 @@ metadata:
   # annotations:
     # platform.confluent.io/disable-internal-rolebindings-creation: "true"
 spec:
-  replicas: 2
+  replicas: 1
   image:
     application: confluentinc/cp-schema-registry:7.3.1
     init: confluentinc/confluent-init-container:2.5.1
@@ -508,7 +508,7 @@ metadata:
   # annotations:
   #   platform.confluent.io/disable-internal-rolebindings-creation: "true"
 spec:
-  replicas: 2
+  replicas: 1
   image:
     application: confluentinc/cp-ksqldb-server:7.3.1
     init: confluentinc/confluent-init-container:2.5.1

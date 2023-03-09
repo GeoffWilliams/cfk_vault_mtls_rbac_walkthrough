@@ -20,7 +20,7 @@ With testing and troubleshooting hints
 * awk
 * confluent cli
 * docker
-* Big laptop to run this on. Recommend at least 32GB RAM and at least 64GB swap
+* Big laptop to run this on. Recommend at least 16GB RAM and at least 64GB swap
 * cfssl (cloudflare ssl) `apt install golang-cfssl`
 * [confluent-kubernetes-examples](https://github.com/confluentinc/confluent-kubernetes-examples/) symlinked, eg:
   ```
