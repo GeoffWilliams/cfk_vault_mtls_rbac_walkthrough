@@ -169,7 +169,14 @@ cp confluent-kubernetes-examples/security/configure-with-vault/credentials/ . -R
 https://docs.confluent.io/platform/current/kafka/configure-mds/index.html#create-a-pem-key-pair
 
 ```
-openssl genrsa --traditional -out credentials/rbac/mds-tokenkeypair.txt 2048
+if [ $(openssl version | awk '{split($2, v, "."); print v[1]}') -eq 3 ] ; then
+  # new
+  openssl genrsa --traditional -out credentials/rbac/mds-tokenkeypair.txt 2048
+else
+  # mac/old
+  openssl genrsa -out credentials/rbac/mds-tokenkeypair.txt 2048
+fi
+
 openssl rsa -in credentials/rbac/mds-tokenkeypair.txt -outform PEM -pubout -out credentials/rbac/mds-publickey.txt
 ```
 
