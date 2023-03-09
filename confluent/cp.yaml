@@ -18,6 +18,13 @@ spec:
   tls:
     directoryPathInContainer: /vault/secrets
   podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"  
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/role: confluent-operator
@@ -171,6 +178,13 @@ spec:
             userSearchBase: dc=test,dc=com
             groupSearchScope: 2
   podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"    
     serviceAccountName: confluent-sa
     annotations:
       kafkacluster-manual-roll: "1"
@@ -318,6 +332,13 @@ spec:
       domain: mydomain.example
       prefix: connect
   podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"    
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -415,6 +436,13 @@ spec:
     server:
     - confluent.license.topic=_confluent-command  
   podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"    
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -511,6 +539,13 @@ spec:
   #   server:
   #     - ksql.schema.registry.url=https://schemaregistry.confluent.svc.cluster.local:8081  
   podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"    
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -610,6 +645,13 @@ spec:
   license:
     directoryPathInContainer: /vault/secrets
   podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"    
     probe:
       liveness:
         periodSeconds: 10
@@ -735,6 +777,13 @@ spec:
       tls:
         enabled: true
   podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"    
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
