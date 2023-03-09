@@ -608,12 +608,6 @@ metadata:
   #   platform.confluent.io/disable-internal-rolebindings-creation: "true"
 spec:
   replicas: 1
-  podTemplate:
-    probe:
-      liveness:
-        periodSeconds: 10
-        failureThreshold: 5
-        timeoutSeconds: 500 
   image:
     application: confluentinc/cp-enterprise-control-center:7.3.1
     init: confluentinc/confluent-init-container:2.5.1
@@ -633,6 +627,11 @@ spec:
   license:
     directoryPathInContainer: /vault/secrets
   podTemplate:
+    probe:
+      liveness:
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 500   
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
