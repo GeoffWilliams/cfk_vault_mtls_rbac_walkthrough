@@ -5,6 +5,7 @@ metadata:
   namespace: confluent
 spec:
   replicas: 3
+  oneReplicaPerNode: true
   image:
     application: confluentinc/cp-zookeeper:7.3.1
     init: confluentinc/confluent-init-container:2.5.1
@@ -18,16 +19,6 @@ spec:
     directoryPathInContainer: /vault/secrets
   podTemplate:
     serviceAccountName: confluent-sa
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                    - zookeeper
-            topologyKey: kubernetes.io/hostname    
     annotations:
       vault.hashicorp.com/role: confluent-operator
       vault.hashicorp.com/agent-inject: "true"
@@ -124,6 +115,7 @@ kind: Kafka
 metadata:
   name: kafka
 spec:
+  oneReplicaPerNode: true
   replicas: 3
   image:
     application: confluentinc/cp-server:7.3.1
@@ -180,16 +172,6 @@ spec:
             groupSearchScope: 2
   podTemplate:
     serviceAccountName: confluent-sa
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                    - kafka
-            topologyKey: kubernetes.io/hostname
     annotations:
       kafkacluster-manual-roll: "1"
       vault.hashicorp.com/agent-inject: "true"
