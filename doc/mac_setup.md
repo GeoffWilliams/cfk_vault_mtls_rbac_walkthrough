@@ -3,7 +3,7 @@
 1. [git](https://git-scm.com/), [OpenSSL](https://www.openssl.org/)
     * should already be installed
 2. Docker - must use Docker since `podman` doesnt work properly on macOS with K3D
-    * Corporates: follow instructions from IT to allocate appropriate Docker Desktop license.
+    * Corporates: follow installation instructions from IT to allocate appropriate Docker Desktop license.
     * Install via SSH: (eg for writing instructions for macOS), following https://docs.docker.com/desktop/install/mac-install/#install-from-the-command-line Instructions for starting Docker from the command line https://github.com/docker/for-mac/issues/6504 dont work (any more?). Install using SSH, then login with VNC to start the daemon.
         a. Install `rosetta: softwareupdate --install-rosetta`
         b. `curl -O "https://desktop.docker.com/mac/main/arm64/Docker.dmg?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-mac-arm64"`
