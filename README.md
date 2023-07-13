@@ -20,6 +20,7 @@ On K3d/K3s With testing and troubleshooting hints.
 * Confluent cli
 * Big laptop to run this on. Recommend at least 16GB RAM and at least 64GB swap
 * CFSSL (cloudflare ssl)
+* helm
 
 ## Workstation Setup
 
@@ -82,6 +83,9 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.10/conf
 
 ```shell
 kubectl create namespace hashicorp
+
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo update
 helm install vault hashicorp/vault \
   --namespace hashicorp \
   --set "server.dev.enabled=true"
@@ -140,22 +144,24 @@ helm install vault hashicorp/vault \
 > One-time task!
 
 ```shell
-cp confluent-kubernetes-examples/security/configure-with-vault/credentials/ . -R
+cp -R confluent-kubernetes-examples/security/configure-with-vault/credentials/ .
 ```
 
 ### 7. generate keypair for MDS
 
 > **Note**
-> One-time task!
+> * One-time task!
+> * Some macOS/openssl installs need different arguments to openssl to generate `BEGIN RSA PRIVATE KEY`. Without these the key will be generated but wont work properly in Kafka
+> * Comments arent allowed in interactive `zsh` commands
 
 https://docs.confluent.io/platform/current/kafka/configure-mds/index.html#create-a-pem-key-pair
 
 ```shell
 if [ $(openssl version | awk '{split($2, v, "."); print v[1]}') -eq 3 ] ; then
-  # new
+  echo "openssl: new way"
   openssl genrsa --traditional -out credentials/rbac/mds-tokenkeypair.txt 2048
 else
-  # mac/old
+  echo "openssl: old/mac way"
   openssl genrsa -out credentials/rbac/mds-tokenkeypair.txt 2048
 fi
 
@@ -208,7 +214,6 @@ kubectl exec -it vault-0 -n hashicorp -- /bin/sh
 ```
 
 ```shell
-/ $
 cat /tmp/credentials/controlcenter/basic-server.txt | base64 | vault kv put /secret/controlcenter/basic.txt basic=-
 cat /tmp/credentials/connect/basic-server.txt | base64 | vault kv put /secret/connect/basic.txt basic=-
 cat /tmp/credentials/connect/basic-client.txt | base64 | vault kv put /secret/connect-client/basic.txt basic=-
@@ -250,7 +255,11 @@ kubectl create serviceaccount confluent-sa -n confluent
 kubectl config set-context --current --namespace confluent
 helm repo add confluentinc https://packages.confluent.io/helm
 helm repo update
-helm upgrade -f confluent/values.yaml --namespace confluent --install confluent-operator confluentinc/confluent-for-kubernetes
+# 2.6.0
+helm upgrade -n confluent \
+  -f confluent/values.yaml \
+  --install confluent-operator confluentinc/confluent-for-kubernetes \
+  --version 0.771.13
 ```
 
 > **Warning**

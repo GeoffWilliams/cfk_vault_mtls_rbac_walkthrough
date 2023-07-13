@@ -7,8 +7,8 @@ spec:
   replicas: 3
   oneReplicaPerNode: true
   image:
-    application: confluentinc/cp-zookeeper:7.3.1
-    init: confluentinc/confluent-init-container:2.5.1
+    application: confluentinc/cp-zookeeper:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
   dataVolumeCapacity: 10Gi
   logVolumeCapacity: 10Gi
   authentication:
@@ -24,7 +24,7 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "500m"  
+        cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/role: confluent-operator
@@ -103,17 +103,17 @@ spec:
 #     vault.hashicorp.com/agent-inject-template-connect-bearer: |
 #       {{- with secret "secret/connect/bearer.txt" -}}
 #       {{ .Data.data.bearer | base64Decode }}
-#       {{- end }}  
+#       {{- end }}
 # spec:
 #   serviceAccountName: confluent-sa
 #   containers:
-#   - image: confluentinc/cp-server:7.3.1
+#   - image: confluentinc/cp-server:7.3.3
 #     name: testbox
 #     command: ["/bin/sleep", "3650d"]
 #     resources: {}
 #   dnsPolicy: ClusterFirst
 #   restartPolicy: Never
-# status: {} 
+# status: {}
 
 
 ---
@@ -125,14 +125,14 @@ spec:
   oneReplicaPerNode: true
   replicas: 3
   image:
-    application: confluentinc/cp-server:7.3.1
-    init: confluentinc/confluent-init-container:2.5.1
+    application: confluentinc/cp-server:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
   dataVolumeCapacity: 10Gi
   configOverrides:
-    server: 
-      - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer 
+    server:
+      - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer
       - confluent.authorizer.access.rule.providers=ZK_ACL,CONFLUENT
-      
+
       # audit authentication logging (eg login/login fail)
       #- confluent.security.event.logger.authentication.enable=true
 
@@ -157,7 +157,7 @@ spec:
         type: loadBalancer
         loadBalancer:
           domain: mydomain.example
-          prefix: rb-mds        
+          prefix: rb-mds
       provider:
         type: ldap
         ldap:
@@ -184,7 +184,7 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "500m"    
+        cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
       kafkacluster-manual-roll: "1"
@@ -276,7 +276,7 @@ spec:
         loadBalancer:
           domain: mydomain.example
           brokerPrefix: kafka-
-          bootstrapPrefix: kafka-         
+          bootstrapPrefix: kafka-
       tls:
         enabled: true
         # Will use the certificates in the parent secretRef tls-kafka
@@ -318,8 +318,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-server-connect:7.3.1
-    init: confluentinc/confluent-init-container:2.5.1
+    application: confluentinc/cp-server-connect:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
   tls:
     directoryPathInContainer: /vault/secrets
   # license:
@@ -338,7 +338,7 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "500m"    
+        cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -408,7 +408,7 @@ spec:
       tls:
         enabled: true
 
-       
+
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: SchemaRegistry
@@ -419,8 +419,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-schema-registry:7.3.1
-    init: confluentinc/confluent-init-container:2.5.1
+    application: confluentinc/cp-schema-registry:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
   tls:
     directoryPathInContainer: /vault/secrets
   license:
@@ -431,10 +431,10 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: mydomain.example
-      prefix: sr    
+      prefix: sr
   configOverrides:
     server:
-    - confluent.license.topic=_confluent-command  
+    - confluent.license.topic=_confluent-command
   podTemplate:
     resources:
       requests:
@@ -442,7 +442,7 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "500m"    
+        cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -509,7 +509,7 @@ spec:
           directoryPathInContainer: /vault/secrets/schemaregistry
       tls:
         enabled: true
-     
+
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: KsqlDB
@@ -521,8 +521,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-ksqldb-server:7.3.1
-    init: confluentinc/confluent-init-container:2.5.1
+    application: confluentinc/cp-ksqldb-server:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
   dataVolumeCapacity: 10Gi
   authorization:
     type: rbac
@@ -530,14 +530,14 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: mydomain.example
-      prefix: ksqldb    
+      prefix: ksqldb
   tls:
     directoryPathInContainer: /vault/secrets
   license:
     directoryPathInContainer: /vault/secrets
   # configOverrides:
   #   server:
-  #     - ksql.schema.registry.url=https://schemaregistry.confluent.svc.cluster.local:8081  
+  #     - ksql.schema.registry.url=https://schemaregistry.confluent.svc.cluster.local:8081
   podTemplate:
     resources:
       requests:
@@ -545,7 +545,7 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "500m"    
+        cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -593,7 +593,7 @@ spec:
       vault.hashicorp.com/agent-inject-template-mds-publickey: |
         {{- with secret "secret/mds-publickey.txt" -}}
         {{ .Data.data.mdspublickey | base64Decode }}
-        {{- end }}  
+        {{- end }}
       vault.hashicorp.com/role: confluent-operator
   dependencies:
     kafka:
@@ -627,8 +627,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-enterprise-control-center:7.3.1
-    init: confluentinc/confluent-init-container:2.5.1
+    application: confluentinc/cp-enterprise-control-center:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
   dataVolumeCapacity: 10Gi
   authorization:
     type: rbac
@@ -639,7 +639,7 @@ spec:
       prefix: controlcenter
   configOverrides:
     log4j:
-      - log4j.rootLogger=DEBUG, stdout      
+      - log4j.rootLogger=DEBUG, stdout
   tls:
     directoryPathInContainer: /vault/secrets
   license:
@@ -651,12 +651,12 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "500m"    
+        cpu: "500m"
     probe:
       liveness:
         periodSeconds: 10
         failureThreshold: 5
-        timeoutSeconds: 500   
+        timeoutSeconds: 500
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -673,7 +673,7 @@ spec:
       vault.hashicorp.com/agent-inject-template-keystore.jks: |-
         {{- with secret "secret/controlcenter-keystore.jks" -}}
         {{ .Data.data.keystore | base64Decode }}
-        {{- end }}   
+        {{- end }}
       vault.hashicorp.com/agent-inject-secret-truststore.jks: secret/truststore.jks
       vault.hashicorp.com/agent-inject-template-truststore.jks: |
         {{- with secret "secret/truststore.jks" -}}
@@ -704,7 +704,7 @@ spec:
       vault.hashicorp.com/agent-inject-template-mds-publickey: |
         {{- with secret "secret/mds-publickey.txt" -}}
         {{ .Data.data.mdspublickey | base64Decode }}
-        {{- end }}        
+        {{- end }}
       vault.hashicorp.com/role: confluent-operator
   dependencies:
     kafka:
@@ -739,7 +739,7 @@ spec:
         enabled: true
 
 
----      
+---
 apiVersion: platform.confluent.io/v1beta1
 kind: KafkaRestClass
 metadata:
@@ -760,8 +760,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-kafka-rest:7.3.1
-    init: confluentinc/confluent-init-container:2.5.1
+    application: confluentinc/cp-kafka-rest:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
   tls:
     directoryPathInContainer: /vault/secrets
   externalAccess:
@@ -783,7 +783,7 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "500m"    
+        cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
       vault.hashicorp.com/agent-inject: "true"
@@ -800,7 +800,7 @@ spec:
       vault.hashicorp.com/agent-inject-template-keystore.jks: |-
         {{- with secret "secret/kafkarestproxy-keystore.jks" -}}
         {{ .Data.data.keystore | base64Decode }}
-        {{- end }}   
+        {{- end }}
       vault.hashicorp.com/agent-inject-secret-truststore.jks: secret/truststore.jks
       vault.hashicorp.com/agent-inject-template-truststore.jks: |
         {{- with secret "secret/truststore.jks" -}}

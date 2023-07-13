@@ -21,5 +21,6 @@
 5. `yq`: `brew install yq`
 6. `jq`: `brew install jq`
 7. Confluent CLI: `brew install confluentinc/tap/cli`
-8. CFSSL: https://computingforgeeks.com/how-to-install-cloudflare-cfssl-on-linux-macos/
+8. CFSSL: `go install github.com/cloudflare/cfssl/cmd/...@latest`
+9. [helm](https://helm.sh/): `brew install helm`
 
