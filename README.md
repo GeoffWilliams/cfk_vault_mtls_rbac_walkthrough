@@ -6,37 +6,56 @@ Walkthrough of how to setup:
 * Mutual TLS (mTLS)
 * Role Based Access Control (RBAC)
 
-On K3d/K3s
-
-With testing and troubleshooting hints
+On K3d/K3s With testing and troubleshooting hints.
 
 ## Prerequisites
-* K3D
-* K3S
+* Docker
+* [K3D](https://k3d.io/v5.5.1/#installation)
+  * No K3S needed (it lives inside docker)
 * Openssl
 * JDK (for `keytool`)
-* yq
-* jq
-* awk
-* confluent cli
-* docker
+* `yq`
+* `jq`
+* `awk`
+* Confluent cli
 * Big laptop to run this on. Recommend at least 16GB RAM and at least 64GB swap
-* cfssl (cloudflare ssl) `apt install golang-cfssl`
-* [confluent-kubernetes-examples](https://github.com/confluentinc/confluent-kubernetes-examples/) symlinked, eg:
-  ```
-  # adjust as needed
-  ln -s ~/research/cfk/confluent-kubernetes-examples/
-  ```
+* CFSSL (cloudflare ssl)
+
+## Workstation Setup
+
+* [macOS](./doc/mac_setup.md)
+* [Linux](./doc/linux_setup.md)
+
+## Git repository cloning
+
+On your workstation, check out this project somewhere, eg:
+
+```shell
+mkdir -p ~/research/cfk
+cd ~/research/cfk
+
+git clone https://github.com/GeoffWilliams/cfk_vault_mtls_rbac_walkthrough
+git clone https://github.com/confluentinc/confluent-kubernetes-examples
+
+# link the examples into the expected location
+ln -s ~/research/cfk/confluent-kubernetes-examples/ ~/research/cfk/cfk_vault_mtls_rbac_walkthrough/confluent-kubernetes-examples
+
+# rest of instructions assume current directory
+cd cfk_vault_mtls_rbac_walkthrough
+```
 
 
 ## Cluster setup
+
+> **Note**
+> Use the latest docker and k3d versions!
 
 * K3D built-in servicelb grabs ports on every node and breaks our load balancers, traefik takes port 443
   * Disable servicelb and traefik
   * Use metallb instead
 
-```
-k3d cluster create multiserver --servers 3 --k3s-arg "--no-deploy=traefik@server:*" --k3s-arg "--no-deploy=servicelb@server:*"
+```shell
+k3d cluster create cfk-lab --servers 3 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--disable=servicelb@server:*"
 ```
 
 ### MetalLB
@@ -44,61 +63,24 @@ k3d cluster create multiserver --servers 3 --k3s-arg "--no-deploy=traefik@server
   1. https://metallb.universe.tf/installation/
   2. https://github.com/keunlee/k3d-metallb-starter-kit
 
-**Preparation**
-
-```
-# see what changes would be made, returns nonzero returncode if different
-kubectl get configmap kube-proxy -n kube-system -o yaml | \
-sed -e "s/strictARP: false/strictARP: true/" | \
-kubectl diff -f - -n kube-system
-
-# actually apply the changes, returns nonzero returncode on errors only
-kubectl get configmap kube-proxy -n kube-system -o yaml | \
-sed -e "s/strictARP: false/strictARP: true/" | \
-kubectl apply -f - -n kube-system
-```
 
 **Installation**
 
+```shell
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.10/config/manifests/metallb-native.yaml
 ```
-for cluster_name in $(docker network list --format "{{ .Name}}" | grep k3d); do
-
-cidr_block=$(docker network inspect $cluster_name | jq '.[0].IPAM.Config[0].Subnet' | tr -d '"')
-cidr_base_addr=${cidr_block%???}
-ingress_first_addr=$(echo $cidr_base_addr | awk -F'.' '{print $1,$2,255,0}' OFS='.')
-ingress_last_addr=$(echo $cidr_base_addr | awk -F'.' '{print $1,$2,255,255}' OFS='.')
-ingress_range=$ingress_first_addr-$ingress_last_addr
-
-# switch context to current cluster
-kubectl config use-context $cluster_name
-
-# deploy metallb
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
 
 # configure metallb ingress address range
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: metallb-system
-  name: config
-data:
-  config: |
-    address-pools:
-    - name: default
-      protocol: layer2
-      addresses:
-      - $ingress_range
-EOF
-done
+
+```shell
+./configure_metallb_ingress_range.sh cfk-lab
 ```
 
 ## Vault and secrets setup
 
 ### 1. Install vault
 
-```
+```shell
 kubectl create namespace hashicorp
 helm install vault hashicorp/vault \
   --namespace hashicorp \
@@ -114,7 +96,7 @@ helm install vault hashicorp/vault \
 > `cfssl_profiles` in this git repo differ from those in `confluent-kubernetes-examples` - changed SANs
 
 
-```
+```shell
 ./create_ca.sh
 ./confluent_certs.sh
 ```
@@ -127,7 +109,7 @@ helm install vault hashicorp/vault \
 * uses the scripts from confluent-kubernetes-examples/scripts.
 * modification: specify the output file
 
-```
+```shell
 ./create_component_keystores.sh
 ```
 
@@ -139,15 +121,15 @@ helm install vault hashicorp/vault \
 * uses the scripts from confluent-kubernetes-examples/scripts.
 * modification: work in the /generated directory
 
-```
+```shell
 ./create-truststore.sh  \
     generated/cacerts.pem \
-    mystorepassword    
+    mystorepassword
 ```
 
 ### 5. Load jks files into vault
 
-```
+```shell
 ./load_jks_files_into_vault.sh
 ```
 
@@ -157,18 +139,18 @@ helm install vault hashicorp/vault \
 > **Note**
 > One-time task!
 
-```
+```shell
 cp confluent-kubernetes-examples/security/configure-with-vault/credentials/ . -R
 ```
 
-### 7. generate keypair for MDS 
+### 7. generate keypair for MDS
 
 > **Note**
 > One-time task!
 
 https://docs.confluent.io/platform/current/kafka/configure-mds/index.html#create-a-pem-key-pair
 
-```
+```shell
 if [ $(openssl version | awk '{split($2, v, "."); print v[1]}') -eq 3 ] ; then
   # new
   openssl genrsa --traditional -out credentials/rbac/mds-tokenkeypair.txt 2048
@@ -182,24 +164,24 @@ openssl rsa -in credentials/rbac/mds-tokenkeypair.txt -outform PEM -pubout -out 
 
 ### 8. Load password for jks keystore into vault
 
-```
+```shell
 kubectl exec -it vault-0 --namespace hashicorp -- vault kv put secret/jksPassword.txt password=jksPassword=mystorepassword
 ```
 
 ### 9. Copy credentials to vault pod
 
-```
+```shell
 kubectl -n hashicorp cp credentials vault-0:/tmp
 ```
 
 ### 10. Enable kubernetes vault access
 Best/easiest way to do this is to login to vault via `kubectl` and run commands directly in the container. This is what all the docs say. Don't try to be smart and do all this from outside the container!
 
-```
+```shell
 kubectl exec -it vault-0 --namespace hashicorp -- /bin/sh
 ```
 
-```
+```shell
 vault auth enable kubernetes
 vault write auth/kubernetes/config \
     token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
@@ -221,11 +203,11 @@ vault write auth/kubernetes/role/confluent-operator \
 
 ### 11. Load copied credentials to vault
 
-```
+```shell
 kubectl exec -it vault-0 -n hashicorp -- /bin/sh
 ```
 
-```
+```shell
 / $
 cat /tmp/credentials/controlcenter/basic-server.txt | base64 | vault kv put /secret/controlcenter/basic.txt basic=-
 cat /tmp/credentials/connect/basic-server.txt | base64 | vault kv put /secret/connect/basic.txt basic=-
@@ -243,7 +225,7 @@ cat /tmp/credentials/license.txt | base64 | vault kv put /secret/license.txt lic
 ```
 
 more secrets...
-```
+```shell
 cat /tmp/credentials/rbac/mds-publickey.txt | base64 | vault kv put /secret/mds-publickey.txt mdspublickey=-
 cat /tmp/credentials/rbac/mds-tokenkeypair.txt | base64 | vault kv put /secret/mds-tokenkeypair.txt mdstokenkeypair=-
 cat /tmp/credentials/rbac/ldap.txt | base64 | vault kv put /secret/ldap.txt ldapsimple=-
@@ -256,23 +238,25 @@ cat /tmp/credentials/rbac/mds-client-schemaregistry.txt | base64 | vault kv put 
 
 ## LDAP server
 
-```
+```shell
 kubectl create namespace confluent
 helm upgrade --install -f confluent-kubernetes-examples/assets/openldap/ldaps-rbac.yaml test-ldap confluent-kubernetes-examples/assets/openldap -n confluent
 ```
 
 ## Install CFK
 
-```
+```shell
 kubectl create serviceaccount confluent-sa -n confluent
 kubectl config set-context --current --namespace confluent
-helm upgrade -f confluent/values.yaml --install confluent-operator confluentinc/confluent-for-kubernetes
+helm repo add confluentinc https://packages.confluent.io/helm
+helm repo update
+helm upgrade -f confluent/values.yaml --namespace confluent --install confluent-operator confluentinc/confluent-for-kubernetes
 ```
 
 > **Warning**
 > Check confluent-operator-xxx pod came up ok before proceeding
 
-```
+```shell
 kubectl get pods --no-headers | grep ^confluent-operator
 kubectl describe pod $(kubectl get pods --no-headers | awk '/^confluent-operator/ {print $1}')
 kubectl logs --all-containers $(kubectl get pods --no-headers | awk '/^confluent-operator/ {print $1}')
@@ -285,17 +269,17 @@ kubectl logs --all-containers $(kubectl get pods --no-headers | awk '/^confluent
 
 Kafka rest class can't use vault so use kubernetes secret:
 
-```
+```shell
 kubectl -n confluent create secret generic rest-credential --from-file=bearer.txt=credentials/rbac/kafkarestclass/bearer.txt
 ```
 
-```
+```shell
 kubectl apply -f confluent/cp.yaml
 ```
 
 Check CP pods come up - this takes a while...
 
-```
+```shell
 kubectl get pods
 kubectl logs --all-containers $(kubectl get pods --no-headers | awk '/^confluent-operator/ {print $1}')
 ```
@@ -425,7 +409,7 @@ CREATE TABLE users (
      gender VARCHAR,
      region_id VARCHAR
    ) WITH (
-     KAFKA_TOPIC = 'my-users-topic', 
+     KAFKA_TOPIC = 'my-users-topic',
      VALUE_FORMAT = 'JSON',
      PARTITIONS= 1
    );
@@ -667,7 +651,7 @@ internal-ksqldb-2           CREATED   MrXMxerpRWO-7q_L4_oEzQ   User:ksql      De
 ### Force re-create of all rolebindings
 
 ```
-for RULE in $(kubectl get confluentrolebindings.platform.confluent.io --no-headers | awk '{print $1}') ; do 
+for RULE in $(kubectl get confluentrolebindings.platform.confluent.io --no-headers | awk '{print $1}') ; do
   kubectl delete confluentrolebindings.platform.confluent.io $RULE
 done
 ```
