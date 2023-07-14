@@ -23,17 +23,23 @@ INGRESS_RANGE="${INGRESS_FIRST_ADDR}-${INGRESS_LAST_ADDR}"
 echo "configuring metallb address pool: ${INGRESS_RANGE}"
 
 cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
 metadata:
+  name: default
   namespace: metallb-system
-  name: config
-data:
-  config: |
-    address-pools:
-    - name: default
-      protocol: layer2
-      addresses:
-      - $INGRESS_RANGE
+spec:
+  addresses:
+  # Address pool MetalLB will allocate from, adjust your router to not
+  # allocate address in this range to prevent clash
+  - $INGRESS_RANGE
+EOF
+
+cat <<EOF | kubectl apply -f -
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default-advertisement
+  namespace: metallb-system
 EOF
 
