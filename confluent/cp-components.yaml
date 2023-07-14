@@ -232,9 +232,9 @@ spec:
     resources:
       requests:
         memory: "50Mi"
-        cpu: "250m"
+        cpu: "500m"
       limits:
-        memory: "500Mi"
+        memory: "750Mi"
         cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
