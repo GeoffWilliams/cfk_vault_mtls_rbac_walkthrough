@@ -11,7 +11,7 @@
         d. `sudo /Volumes/Docker/Docker.app/Contents/MacOS/install --accept-license`
         e. `/Volumes/Docker/Docker.app/Contents/Resources/bin/docker run hello-world`
         f. Login with VNC, start Docker Daemon
-    * Docker Desktop GUI settings:
+    * Docker Desktop GUI settings - it seems to be important on macOS to max out all settings to the detriment of the OS itself(?):
         * Increase CPU (8)
         * Increase Memory (16GB)
         * Increase Swap (4GB)

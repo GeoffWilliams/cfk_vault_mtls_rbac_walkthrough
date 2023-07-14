@@ -7,7 +7,7 @@ spec:
   replicas: 3
   oneReplicaPerNode: true
   image:
-    application: confluentinc/cp-zookeeper:7.3.3
+    application: confluentinc/cp-zookeeper:7.4.0
     init: confluentinc/confluent-init-container:2.6.0
   dataVolumeCapacity: 10Gi
   logVolumeCapacity: 10Gi

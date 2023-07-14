@@ -286,10 +286,11 @@ kubectl -n confluent create secret generic rest-credential --from-file=bearer.tx
 ```
 
 > **Note**
-> This will take 5 - 10 minutes and macOS will be slow
+> This will take 10+ minutes and macOS will be slow
 
 ```shell
-# split up for ease of debugging
+# split up for ease of debugging, apply each file then check pods are alive. This is worth doing on resource
+# constrained environments such as Apple
 kubectl apply -f confluent/cp-zookeepers.yaml
 kubectl apply -f confluent/cp-kafkas.yaml
 kubectl apply -f confluent/cp-components.yaml
@@ -299,7 +300,8 @@ Check CP pods come up - this takes a while...
 
 ```shell
 kubectl get pods
-kubectl logs --all-containers $(kubectl get pods --no-headers | awk '/^confluent-operator/ {print $1}')
+# adjust as needed
+kubectl logs --all-containers XXX
 ```
 
 Enable `testadmin` to access control center:
