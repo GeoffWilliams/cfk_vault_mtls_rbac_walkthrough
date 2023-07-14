@@ -15,7 +15,8 @@ CIDR_BLOCK=$(docker network inspect $K3D_CLUSTER_NAME | jq -r '.[0].IPAM.Config[
 CIDR_BASE_ADDR=${CIDR_BLOCK%???}
 
 # careful! this will only work for /16 networks, need to do maths otherwise...
-INGRESS_FIRST_ADDR=$(echo $CIDR_BASE_ADDR | awk -F'.' '{print $1,$2,0,0}' OFS='.')
+# also reserve a chunk at the start of the range
+INGRESS_FIRST_ADDR=$(echo $CIDR_BASE_ADDR | awk -F'.' '{print $1,$2,0,100}' OFS='.')
 INGRESS_LAST_ADDR=$(echo $CIDR_BASE_ADDR | awk -F'.' '{print $1,$2,255,255}' OFS='.')
 INGRESS_RANGE="${INGRESS_FIRST_ADDR}-${INGRESS_LAST_ADDR}"
 
