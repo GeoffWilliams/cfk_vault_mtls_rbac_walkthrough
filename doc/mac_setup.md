@@ -12,9 +12,11 @@
         e. `/Volumes/Docker/Docker.app/Contents/Resources/bin/docker run hello-world`
         f. Login with VNC, start Docker Daemon
     * Docker Desktop GUI settings:
-        * Increase Memory (12GB)
+        * Increase CPU (8)
+        * Increase Memory (16GB)
         * Increase Swap (4GB)
         * Increase Virtual disk limit (100GB)
+        * `Apply and Restart`
     * Prove docker works: `docker run hello-world`
 3. [K3D](https://k3d.io/v5.4.1/#installation)
 4. JDK: `brew install java` and follow the instructions to update your shell

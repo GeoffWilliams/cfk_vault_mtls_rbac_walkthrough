@@ -57,6 +57,9 @@ cd cfk_vault_mtls_rbac_walkthrough
 
 ```shell
 k3d cluster create cfk-lab --servers 3 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--disable=servicelb@server:*"
+
+# test - K3D sets itself as default in ~/.kube/config
+kubectl get nodes
 ```
 
 ### MetalLB
@@ -282,8 +285,14 @@ Kafka rest class can't use vault so use kubernetes secret:
 kubectl -n confluent create secret generic rest-credential --from-file=bearer.txt=credentials/rbac/kafkarestclass/bearer.txt
 ```
 
+> **Note**
+> This will take 5 - 10 minutes and macOS will be slow
+
 ```shell
-kubectl apply -f confluent/cp.yaml
+# split up for ease of debugging
+kubectl apply -f confluent/cp-zookeepers.yaml
+kubectl apply -f confluent/cp-kafkas.yaml
+kubectl apply -f confluent/cp-components.yaml
 ```
 
 Check CP pods come up - this takes a while...
@@ -295,7 +304,7 @@ kubectl logs --all-containers $(kubectl get pods --no-headers | awk '/^confluent
 
 Enable `testadmin` to access control center:
 
-```
+```shell
 kubectl apply -f confluent/controlcenter-testadmin-rolebindings.yaml
 ```
 
@@ -303,7 +312,7 @@ kubectl apply -f confluent/controlcenter-testadmin-rolebindings.yaml
 
 Paste output into /etc/hosts
 
-```
+```shell
 kubectl get services --no-headers | awk '/-lb/ {gsub(/(-bootstrap)?-lb/, "", $1) ; print $4 " "  $1".mydomain.example"}'
 ```
 
@@ -314,19 +323,19 @@ kubectl get services --no-headers | awk '/-lb/ {gsub(/(-bootstrap)?-lb/, "", $1)
 > **Note**
 > Zookeeper is not exposed outside the cluster
 
-```
+```shell
 kubectl exec -ti zookeeper-0 -- bash -c "echo ruok | nc localhost 2181"
 ```
 
 ### Kafka
 
 #### Inside the cluster
-```
+
+```shell
 kubectl exec -ti kafka-0 -- sh
 ```
 
-```
-
+```shell
 cat <<EOF > /tmp/kafka.properties
 security.protocol=SSL
 ssl.truststore.location=/vault/secrets/truststore.jks
@@ -342,7 +351,7 @@ kafka-topics --command-config /tmp/kafka.properties --bootstrap-server kafka.con
 
 #### Outside the cluster
 
-```
+```shell
 kafka-topics --command-config kafka.properties --bootstrap-server kafka.mydomain.example:9092  --list
 ```
 
@@ -351,14 +360,14 @@ kafka-topics --command-config kafka.properties --bootstrap-server kafka.mydomain
 
 #### Inside the cluster
 
-```
+```shell
 kubectl exec -ti schemaregistry-0 -- curl -k https://testadmin:testadmin@localhost:8081
 kubectl exec -ti schemaregistry-0 -- curl -k https://sr:sr-secret@localhost:8081/permissions
 ```
 
 #### Outside the cluster
 
-```
+```shell
 curl --cacert generated/cacerts.pem  https://sr:sr-secret@schemaregistry.mydomain.example
 curl --cacert generated/cacerts.pem  https://sr:sr-secret@schemaregistry.mydomain.example/permissions
 ```
@@ -377,12 +386,12 @@ curl --cacert generated/cacerts.pem  https://sr:sr-secret@schemaregistry.mydomai
 
 #### Inside the cluster
 
-```
+```shell
 kubectl exec -ti ksqldb-0 -- sh
 ```
 
 
-```
+```shell
 cat <<EOF > /tmp/ksql-cli.properties
 ssl.truststore.location=/vault/secrets/truststore.jks
 ssl.truststore.password=mystorepassword
@@ -398,7 +407,7 @@ ksql --config-file /tmp/ksql-cli.properties --user testadmin --password testadmi
 
 #### Outside the cluster
 
-```
+```shell
 ksql --config-file ksql-cli.properties --user testadmin --password testadmin https://ksqldb.mydomain.example
 ```
 
@@ -407,11 +416,11 @@ ksql --config-file ksql-cli.properties --user testadmin --password testadmin htt
 
 #### Test KSQL script
 
-```
+```sql
 SHOW ALL TOPICS;
 ```
 
-```
+```sql
 CREATE TABLE users (
      id BIGINT PRIMARY KEY,
      usertimestamp BIGINT,
@@ -432,13 +441,15 @@ SELECT * FROM QUERYABLE_USERS;
 
 #### Inside the cluster
 
-```
+```shell
 kubectl exec -ti connect-0  -- curl -k https://connect:connect-secret@localhost:8083/connectors
 ```
 
 #### Outside the cluster
 
+```shell
 curl --cacert generated/cacerts.pem https://connect:connect-secret@connect.mydomain.example/connectors
+```
 
 > **Note**
 > Load balancer exposes on port 443 as a https service, not usual port 8083
@@ -455,14 +466,14 @@ curl --cacert generated/cacerts.pem https://connect:connect-secret@connect.mydom
 
 #### Without working load balancer (eg if not using metallb)
 
-/etc/hosts
+`/etc/hosts`
 
 ```
 127.0.0.1 ksqldb
 ```
 
 
-```
+```shell
 kubectl port-forward service/controlcenter 9021:9021
 kubectl port-forward service/ksqldb 8088:8088
 ```
@@ -497,7 +508,7 @@ Use confluent cli reference https://docs.confluent.io/confluent-cli/current/comm
 
 #### Without working load balancer (eg if not using metallb)
 
-/etc/hosts
+`/etc/hosts`
 
 ```
 127.0.0.1 kafka
@@ -507,7 +518,7 @@ Use confluent cli reference https://docs.confluent.io/confluent-cli/current/comm
 kubectl port-forward service/kafka 8090:8090
 ```
 
-```
+```shell
 confluent login --url https://kafka:8090 --ca-cert-path generated/cacerts.pem --save
 username: kafka
 password: kafka-secret
@@ -515,7 +526,7 @@ password: kafka-secret
 
 #### External access via load balancer
 
-```
+```shell
 confluent login --url https://kafka-mds.mydomain.example:443 --ca-cert-path generated/cacerts.pem --save
 username: kafka
 password: kafka-secret
@@ -526,7 +537,7 @@ password: kafka-secret
 > **Note**
 > Export your MDS URL to make the rest of the examples work
 
-```
+```shell
 # Pick as needed
 export CP_MDS_URL=https://kafka:8090
 export CP_MDS_URL=https://kafka-mds.mydomain.example:443
@@ -536,13 +547,13 @@ export CP_MDS_URL=https://kafka-mds.mydomain.example:443
 
 #### kubectl
 
-```
+```shell
 kubectl describe kafkarestclasses.platform.confluent.io default | yq '.Status.["Kafka Cluster ID"]'
 ```
 
 #### Confluent CLI
 
-```
+```shell
 confluent cluster describe --url $CP_MDS_URL --ca-cert-path generated/cacerts.pem | awk '/kafka-cluster/ { print $3}'
 ```
 
@@ -551,11 +562,13 @@ confluent cluster describe --url $CP_MDS_URL --ca-cert-path generated/cacerts.pe
 > **Note**
 > Export your cluster ID to use later
 
+```shell
 export CLUSTER_ID=$(kubectl describe kafkarestclasses.platform.confluent.io default | yq '.Status.["Kafka Cluster ID"]')
+```
 
 ### Kafka ACLs
 
-```
+```shell
 kafka-acls --command-config kafka.properties --bootstrap-server kafka.mydomain.example:9092 --list
 ```
 
@@ -564,7 +577,7 @@ kafka-acls --command-config kafka.properties --bootstrap-server kafka.mydomain.e
 
 #### Print the available RBAC roles
 
-```
+```shell
 confluent iam rbac role list -o json | jq -r .[].name
 ```
 
@@ -586,7 +599,7 @@ UserAdmin
 
 #### Print all RBAC bindings
 
-```
+```shell
 for ROLE in $(confluent iam rbac role list -o json | jq -r .[].name) ; do
   echo "[$ROLE]"
   confluent iam rbac role-binding list --kafka-cluster-id $CLUSTER_ID --role $ROLE
@@ -599,7 +612,7 @@ done
 
 #### List all defined RBAC principals
 
-```
+```shell
 USERS=""
 for ROLE in $(confluent iam rbac role list -o json | jq -r .[].name) ; do
   USERS="$USERS $(confluent iam rbac role-binding list --kafka-cluster-id $CLUSTER_ID --role $ROLE -o json | jq -r .[].principal) "
@@ -613,7 +626,7 @@ echo $USERS | sed 's/ /\n/g' | sort | uniq
 
 #### Print the RBAC bindings for a principal
 
-```
+```shell
 confluent iam rbac role-binding list --kafka-cluster-id $CLUSTER_ID --principal User:testadmin
 ```
 
@@ -622,12 +635,20 @@ confluent iam rbac role-binding list --kafka-cluster-id $CLUSTER_ID --principal 
 
 Denied access
 
-```
+```shell
 kafka-console-consumer --bootstrap-server kafka.mydomain.example:9092 --consumer.config kafka.properties --topic confluent-audit-log-events | jq 'select(.data.authorizationInfo.granted == false)'
 ```
 
 
 ## Troubleshooting
+
+### Pod(s) stuck on `INIT`
+
+1. kubectl describe CRD (eg `kubectl describe zookeepers zookeeper`)
+2. kubectl describe pod (eg `kubectl describe zookeeper-0`)
+3. Sidecar/init container errors can _stuck_ the pod, check logs: logs can cause stuck (eg):
+  a. `kubectl logs zookeeper-0 -c vault-agent-init`
+  b. `kubectl logs zookeeper-0 -c config-init-container`
 
 ### Some or all pods missing
 Describe the CRD and you will normally find a missing dependency that failed to init the pod, eg:
@@ -639,7 +660,7 @@ kubectl logs --all-containers schemaregistry-1
 
 ### Permission errors in logs
 
-```
+```shell
 kubectl get confluentrolebindings.platform.confluent.io
 ```
 
@@ -659,7 +680,7 @@ internal-ksqldb-2           CREATED   MrXMxerpRWO-7q_L4_oEzQ   User:ksql      De
 
 ### Force re-create of all rolebindings
 
-```
+```shell
 for RULE in $(kubectl get confluentrolebindings.platform.confluent.io --no-headers | awk '{print $1}') ; do
   kubectl delete confluentrolebindings.platform.confluent.io $RULE
 done
@@ -684,12 +705,12 @@ openssl s_client -showcerts kafka-bootstrap-lb:9092| openssl x509 -text
 
 Docs: https://docs.confluent.io/operator/current/co-roll-cluster.html#restart-cp
 
-1. increment value `kafkacluster-manual-roll: "n"` in confluent/cp.yaml
-2. `kubectl apply -f confluent/cp.yaml`
+1. increment value `kafkacluster-manual-roll: "n"` in confluent/cp-kafka.yaml
+2. `kubectl apply -f confluent/cp-kafka.yaml`
 
 **CP Compoenents**
 
-```
+```shell
 for COMPONENT in $(kubectl -n confluent get statefulset -o wide --no-headers | awk '/confluentinc/ {print $1}') ; do
   kubectl rollout restart statefulset/$COMPONENT --namespace confluent
 done
@@ -700,7 +721,7 @@ done
 > **Note**
 > Don't forget your RBAC rules are gone once you delete a cluster! put them back:
 
-```
+```shell
 kubectl apply -f confluent/controlcenter-testadmin-rolebindings.yaml
 ```
 
@@ -719,7 +740,7 @@ No persistant storage is configured so each cluster gets a factory reset. I cons
 
 ### Test reading a secret back from vault
 
-```
+```shell
 kubectl exec -it vault-0 --namespace hashicorp -- vault kv get -format=json -field=data secret/ksqldb/bearer.txt
 ```
 
@@ -733,7 +754,11 @@ kubectl exec -it vault-0 --namespace hashicorp -- vault kv get -format=json -fie
 
 Docs: https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
 
-```
+```shell
 kubectl apply -f dns-utils.yaml
 kubectl exec -i -t dnsutils -n default  -- nslookup kafka.confluent.svc.cluster.local
 ```
+
+### Secrets all gone from vault!
+
+When the vault container restarts it looses all its secrets and service accounts. Re-run the instructions to load them.

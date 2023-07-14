@@ -1,0 +1,84 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Zookeeper
+metadata:
+  name: zookeeper
+  namespace: confluent
+spec:
+  replicas: 3
+  oneReplicaPerNode: true
+  image:
+    application: confluentinc/cp-zookeeper:7.3.3
+    init: confluentinc/confluent-init-container:2.6.0
+  dataVolumeCapacity: 10Gi
+  logVolumeCapacity: 10Gi
+  authentication:
+    type: mtls
+    principalMappingRules:
+      - RULE:.*CN[\s]?=[\s]?([a-zA-Z0-9.]*)?.*/$1/
+  tls:
+    directoryPathInContainer: /vault/secrets
+  podTemplate:
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    serviceAccountName: confluent-sa
+    annotations:
+      vault.hashicorp.com/role: confluent-operator
+      vault.hashicorp.com/agent-inject: "true"
+      vault.hashicorp.com/agent-inject-status: update
+      vault.hashicorp.com/preserve-secret-case: "true"
+
+      vault.hashicorp.com/secret-volume-path-jksPassword.txt: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-jksPassword.txt: jksPassword.txt
+      vault.hashicorp.com/agent-inject-secret-jksPassword.txt: secret/jksPassword.txt
+      vault.hashicorp.com/agent-inject-template-jksPassword.txt: |-
+        {{- with secret "secret/jksPassword.txt" -}}
+        {{ .Data.data.password }}
+        {{- end }}
+
+      vault.hashicorp.com/secret-volume-path-truststore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-truststore.jks: truststore.jks
+      vault.hashicorp.com/agent-inject-secret-truststore.jks: secret/truststore.jks
+      vault.hashicorp.com/agent-inject-template-truststore.jks: |-
+        {{- with secret "secret/truststore.jks" -}}
+        {{ .Data.data.truststore | base64Decode }}
+        {{- end }}
+
+      vault.hashicorp.com/secret-volume-path-license.txt: /vault/secrets
+      vault.hashicorp.com/agent-inject-secret-license: secret/license.txt
+      vault.hashicorp.com/agent-inject-file-license: license.txt # this are mandatory names
+      vault.hashicorp.com/agent-inject-template-license: |
+        {{- with secret "secret/license.txt" -}}
+        {{ .Data.data.license | base64Decode }}
+        {{- end }}
+
+      vault.hashicorp.com/secret-volume-path-ldap.txt: /vault/secrets
+      vault.hashicorp.com/agent-inject-secret-ldap-simple: secret/ldap.txt
+      vault.hashicorp.com/agent-inject-file-ldap-simple: ldap.txt # must be with this name
+      vault.hashicorp.com/agent-inject-template-ldap-simple: |
+        {{- with secret "secret/ldap.txt" -}}
+        {{ .Data.data.ldapsimple | base64Decode }}
+        {{- end }}
+
+      # keystore
+      vault.hashicorp.com/secret-volume-path-keystore.jks: /vault/secrets
+      vault.hashicorp.com/agent-inject-file-keystore.jks: keystore.jks
+      vault.hashicorp.com/agent-inject-secret-keystore.jks: secret/zookeeper-keystore.jks
+      vault.hashicorp.com/agent-inject-template-keystore.jks: |-
+        {{- with secret "secret/zookeeper-keystore.jks" -}}
+        {{ .Data.data.keystore | base64Decode }}
+        {{- end }}
+
+      # server digest
+      vault.hashicorp.com/agent-inject-secret-zk-server-digest: secret/zookeeper/digest-jaas.conf
+      vault.hashicorp.com/secret-volume-path-zk-server-digest: /vault/secrets/jaas
+      vault.hashicorp.com/agent-inject-file-zk-server-digest: digest-jaas.conf
+      vault.hashicorp.com/agent-inject-template-zk-server-digest: |
+        {{- with secret "secret/zookeeper/digest-jaas.conf" -}}
+        {{ .Data.data.digest | base64Decode }}
+        {{- end }}
+
