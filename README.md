@@ -77,7 +77,7 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.10/conf
 # configure metallb ingress address range
 
 ```shell
-./configure_metallb_ingress_range.sh cfk-lab
+./scripts/configure_metallb_ingress_range.sh cfk-lab
 ```
 
 ## Vault and secrets setup
@@ -104,8 +104,8 @@ helm install vault hashicorp/vault \
 
 
 ```shell
-./create_ca.sh
-./confluent_certs.sh
+./scripts/create_ca.sh
+./scripts/confluent_certs.sh
 ```
 
 ### 3. Create JKS keystore for each component
@@ -117,7 +117,7 @@ helm install vault hashicorp/vault \
 * modification: specify the output file
 
 ```shell
-./create_component_keystores.sh
+./scripts/create_component_keystores.sh
 ```
 
 ### 4. Create a truststore for our CA
@@ -129,7 +129,7 @@ helm install vault hashicorp/vault \
 * modification: work in the /generated directory
 
 ```shell
-./create-truststore.sh  \
+./scripts/create-truststore.sh  \
     generated/cacerts.pem \
     mystorepassword
 ```
@@ -137,23 +137,24 @@ helm install vault hashicorp/vault \
 ### 5. Load jks files into vault
 
 ```shell
-./load_jks_files_into_vault.sh
+./scripts/load_jks_files_into_vault.sh
 ```
 
 ### 6. Copy the basic credentials from confluent-kubernetes-examples
 
 
 > **Note**
-> One-time task!
+> This task has been done for you already
 
 ```shell
-cp -R confluent-kubernetes-examples/security/configure-with-vault/credentials/ .
+# already done
+# cp -R confluent-kubernetes-examples/security/configure-with-vault/credentials/ credentials
 ```
 
 ### 7. generate keypair for MDS
 
 > **Note**
-> * One-time task!
+> * **This task has been done for you already**
 > * Some macOS/openssl installs need different arguments to openssl to generate `BEGIN RSA PRIVATE KEY`. Without these the key will be generated but wont work properly in Kafka
 > * Comments arent allowed in interactive `zsh` commands
 
