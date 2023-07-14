@@ -144,11 +144,11 @@ helm install vault hashicorp/vault \
 
 
 > **Note**
-> This task has been done for you already
+> * **This task has been done for you already**
 
 ```shell
-# already done
-# cp -R confluent-kubernetes-examples/security/configure-with-vault/credentials/ credentials
+# already done - for your reference
+cp -R confluent-kubernetes-examples/security/configure-with-vault/credentials/ credentials
 ```
 
 ### 7. generate keypair for MDS
@@ -161,6 +161,8 @@ helm install vault hashicorp/vault \
 https://docs.confluent.io/platform/current/kafka/configure-mds/index.html#create-a-pem-key-pair
 
 ```shell
+# already done - for your reference
+
 if [ $(openssl version | awk '{split($2, v, "."); print v[1]}') -eq 3 ] ; then
   echo "openssl: new way"
   openssl genrsa --traditional -out credentials/rbac/mds-tokenkeypair.txt 2048
@@ -691,14 +693,14 @@ done
 
 ### Force all pods recreate for a service
 
-```
+```shell
 kubectl delete schemaregistries.platform.confluent.io schemaregistry
 kubectl apply -f confluent/cp.yaml
 ```
 
 ### How to debug SSL certs from a service?
 
-```
+```shell
 openssl s_client -showcerts kafka-bootstrap-lb:9092| openssl x509 -text
 ```
 

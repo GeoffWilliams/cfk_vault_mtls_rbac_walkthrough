@@ -96,10 +96,10 @@ spec:
   podTemplate:
     resources:
       requests:
-        memory: "500Mi"
+        memory: "100Mi"
         cpu: "250m"
       limits:
-        memory: "1Gi"
+        memory: "500Mi"
         cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:

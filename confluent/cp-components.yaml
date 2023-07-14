@@ -24,10 +24,10 @@ spec:
   podTemplate:
     resources:
       requests:
-        memory: "500Mi"
+        memory: "50Mi"
         cpu: "250m"
       limits:
-        memory: "1Gi"
+        memory: "500Mi"
         cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
@@ -128,10 +128,10 @@ spec:
   podTemplate:
     resources:
       requests:
-        memory: "500Mi"
+        memory: "50Mi"
         cpu: "250m"
       limits:
-        memory: "1Gi"
+        memory: "500Mi"
         cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
@@ -231,10 +231,10 @@ spec:
   podTemplate:
     resources:
       requests:
-        memory: "500Mi"
+        memory: "50Mi"
         cpu: "250m"
       limits:
-        memory: "1Gi"
+        memory: "500Mi"
         cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
@@ -329,7 +329,10 @@ spec:
       prefix: controlcenter
   configOverrides:
     log4j:
-      - log4j.rootLogger=DEBUG, stdout
+    - log4j.rootLogger=DEBUG, stdout
+    server:
+    # reduced infrastructure mode
+    - confluent.controlcenter.mode.enable=management
   tls:
     directoryPathInContainer: /vault/secrets
   license:
@@ -337,10 +340,10 @@ spec:
   podTemplate:
     resources:
       requests:
-        memory: "500Mi"
+        memory: "50Mi"
         cpu: "250m"
       limits:
-        memory: "1Gi"
+        memory: "2Gi"
         cpu: "500m"
     probe:
       liveness:
@@ -469,10 +472,10 @@ spec:
   podTemplate:
     resources:
       requests:
-        memory: "500Mi"
+        memory: "50Mi"
         cpu: "250m"
       limits:
-        memory: "1Gi"
+        memory: "500Mi"
         cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
