@@ -23,7 +23,7 @@
 # spec:
 #   serviceAccountName: confluent-sa
 #   containers:
-#   - image: confluentinc/cp-server:7.4.0
+#   - image: confluentinc/cp-server:7.4.1
 #     name: testbox
 #     command: ["/bin/sleep", "3650d"]
 #     resources: {}
@@ -41,8 +41,8 @@ spec:
   oneReplicaPerNode: true
   replicas: 3
   image:
-    application: confluentinc/cp-server:7.4.0
-    init: confluentinc/confluent-init-container:2.6.0
+    application: confluentinc/cp-server:7.4.1
+    init: confluentinc/confluent-init-container:2.6.1
   dataVolumeCapacity: 10Gi
   configOverrides:
     server:
