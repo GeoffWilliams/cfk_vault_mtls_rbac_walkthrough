@@ -13,7 +13,7 @@ COMPONENTS="
 
 for COMPONENT in $COMPONENTS ; do
     echo "keystore for $COMPONENT"
-    ./create-keystore.sh  \
+    $(dirname $0)/create-keystore.sh  \
         $WORKDIR/$COMPONENT.pem \
         $WORKDIR/$COMPONENT-key.pem \
         $WORKDIR/$COMPONENT-keystore.jks \
