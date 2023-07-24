@@ -23,7 +23,7 @@ spec:
         memory: "100Mi"
         cpu: "250m"
       limits:
-        memory: "500Mi"
+        memory: "200Mi"
         cpu: "500m"
     serviceAccountName: confluent-sa
     annotations:
