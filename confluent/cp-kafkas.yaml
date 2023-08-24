@@ -90,7 +90,7 @@ spec:
             groupNameAttribute: cn
             groupObjectClass: posixGroup
             groupMemberAttribute: memberuid
-            groupMemberAttributePattern: CN=(.*),OU=users,DC=test,DC=com
+            groupMemberAttributePattern: cn=(.*),ou=users,dc=test,dc=com
             groupSearchBase: dc=test,dc=com
             userNameAttribute: cn
             userMemberOfAttributePattern: CN=(.*),DC=test,DC=com
