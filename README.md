@@ -27,6 +27,18 @@ On K3d/K3s With testing and troubleshooting hints.
 * [macOS](./doc/mac_setup.md)
 * [Linux](./doc/linux_setup.md)
 
+### macOS
+
+For Apple ARM64, setup:
+
+1. [macOS apps](https://github.com/GeoffWilliams/aws_macos/blob/master/doc/app_setup.md)
+2. [Docker with bridge networking](https://github.com/GeoffWilliams/aws_macos/blob/master/doc/docker.md)
+3. [K3D](https://github.com/GeoffWilliams/aws_macos/blob/master/doc/k3d.md)
+
+### Linux
+
+You know what to do.
+
 ## Git repository cloning
 
 On your workstation, check out this project somewhere, eg:
@@ -48,25 +60,14 @@ cd cfk_vault_mtls_rbac_walkthrough
 
 ## Cluster setup
 
-> **Note**
-> Use the latest docker and k3d versions!
+_already done as part of workstation setup_
 
-* K3D built-in servicelb grabs ports on every node and breaks our load balancers, traefik takes port 443
-  * Disable servicelb and traefik
-  * Use metallb instead
+## MetalLB
 
-```shell
-k3d cluster create cfk-lab --servers 3 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--disable=servicelb@server:*"
+Instruction source:
 
-# test - K3D sets itself as default in ~/.kube/config
-kubectl get nodes
-```
-
-### MetalLB
-* Instruction source:
-  1. https://metallb.universe.tf/installation/
-  2. https://github.com/keunlee/k3d-metallb-starter-kit
-
+1. https://metallb.universe.tf/installation/
+2. https://github.com/keunlee/k3d-metallb-starter-kit
 
 **Installation**
 
@@ -261,11 +262,11 @@ kubectl create serviceaccount confluent-sa -n confluent
 kubectl config set-context --current --namespace confluent
 helm repo add confluentinc https://packages.confluent.io/helm
 helm repo update
-# 2.6.0
+# 2.6.1
 helm upgrade -n confluent \
   -f confluent/values.yaml \
   --install confluent-operator confluentinc/confluent-for-kubernetes \
-  --version 0.771.13
+  --version 0.771.29
 ```
 
 > **Warning**
@@ -644,6 +645,11 @@ Denied access
 kafka-console-consumer --bootstrap-server kafka.mydomain.example:9092 --consumer.config kafka.properties --topic confluent-audit-log-events | jq 'select(.data.authorizationInfo.granted == false)'
 ```
 
+## Cleanup
+
+```shell
+k3d cluster delete cfk-lab
+```
 
 ## Troubleshooting
 
