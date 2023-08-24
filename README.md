@@ -35,7 +35,7 @@ For Apple ARM64, setup:
 
 1. [macOS apps](https://github.com/GeoffWilliams/aws_macos/blob/master/doc/app_setup.md)
 2. [Docker with bridge networking](https://github.com/GeoffWilliams/aws_macos/blob/master/doc/docker.md)
-3. [K3D](https://github.com/GeoffWilliams/aws_macos/blob/master/doc/k3d.md)
+3. [K3D - including cluster setup](https://github.com/GeoffWilliams/aws_macos/blob/master/doc/k3d.md)
 
 ### Linux
 
