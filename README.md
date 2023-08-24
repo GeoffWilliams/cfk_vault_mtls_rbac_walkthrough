@@ -5,6 +5,8 @@ Walkthrough of how to setup:
 * Confluent for Kubernetes (CFK)
 * Mutual TLS (mTLS)
 * Role Based Access Control (RBAC)
+* CP access via metallb load balancers
+  * This includes REST Web Services - normally these would be accessed via ingress (Istio, nginx, etc) - for simplicity just use load balancers everywhere in this lab
 
 On K3d/K3s With testing and troubleshooting hints.
 
