@@ -46,7 +46,11 @@ spec:
   dataVolumeCapacity: 10Gi
   configOverrides:
     server:
-      - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer
+      # example of how to force specific cache time
+      - ldap.refresh.interval.ms=120000
+
+      # example of how to override the authorizer in Kafka
+      # - authorizer.class.name=io.confluent.kafka.security.authorizer.ConfluentServerAuthorizer
       - confluent.authorizer.access.rule.providers=ZK_ACL,CONFLUENT
 
       # audit authentication logging (eg login/login fail)

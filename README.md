@@ -290,7 +290,8 @@ kubectl -n confluent create secret generic rest-credential --from-file=bearer.tx
 ```
 
 > **Note**
-> This will take 10+ minutes and macOS will be slow
+> * This will take 10+ minutes and macOS will be slow
+> * The api resources are created with short names so you can _also_ do kubectl describe zookeeper (or zk), kubectl get cfrb etc. This is left as an exercise for the reader
 
 ```shell
 # split up for ease of debugging, apply each file then check pods are alive. This is worth doing on resource
