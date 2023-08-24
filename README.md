@@ -383,11 +383,11 @@ curl --cacert generated/cacerts.pem  https://sr:sr-secret@schemaregistry.mydomai
 
 ### KSQL
 
-|Username|Password|Access|
-|--- | --- | --- |
-| `ksql` | `ksql-secret` | can login and sees limited topics |
-| `testadmin` | `testadmin` | God user once `controlcenter-testadmin-rolebindings.yaml` applied |
-| `kafka` | `kafka-secret` | forbidden |
+| Username    | Password       | Access                                                            |
+| ----------- | -------------- | ----------------------------------------------------------------- |
+| `ksql`      | `ksql-secret`  | Can login and sees limited topics                                 |
+| `testadmin` | `testadmin`    | God user once `controlcenter-testadmin-rolebindings.yaml` applied |
+| `kafka`     | `kafka-secret` | Forbidden                                                         |
 
 
 #### Inside the cluster
@@ -440,6 +440,10 @@ CREATE TABLE users (
 
 INSERT INTO users VALUES (1,1,'m','a');
 CREATE TABLE QUERYABLE_USERS AS SELECT * FROM USERS;
+
+-- wait a few seconds to prevent error:
+--  Error starting pull query: Cannot determine which host contains the required partitions to serve the pull query.
+--  The underlying persistent query may be restarting (e.g. as a result of ALTER SYSTEM) view the status of your by issuing <DESCRIBE foo>.
 SELECT * FROM QUERYABLE_USERS;
 ```
 
@@ -463,12 +467,11 @@ curl --cacert generated/cacerts.pem https://connect:connect-secret@connect.mydom
 
 ### Control center
 
-|Username|Password|Access|
-|--- | --- | --- |
-| `c3` | `c3-secret` | can admin the cluster but not see KSQL/Schema Registry/Connect |
-| `testadmin` | `testadmin` | God user once `controlcenter-testadmin-rolebindings.yaml` applied |
-| `kafka` | `kafka-secret` | Can login but see no clusters |
-
+| Username    | Password       | Access                                                            |
+| ----------- | -------------- | ----------------------------------------------------------------- |
+| `c3`        | `c3-secret`    | Can admin the cluster but not see KSQL/Schema Registry/Connect    |
+| `testadmin` | `testadmin`    | God user once `controlcenter-testadmin-rolebindings.yaml` applied |
+| `kafka`     | `kafka-secret` | Can login but see no clusters                                     |
 
 #### Without working load balancer (eg if not using metallb)
 
@@ -511,6 +514,9 @@ Access control center:
 ### Confluent CLI setup
 
 Use confluent cli reference https://docs.confluent.io/confluent-cli/current/command-reference/confluent_login.html#flags
+
+> **Note**
+> On macOS you must run `confluent` inside a GUI session (not SSH) to allow the keychain to be unlocked. This is different to Linux where `~/.netrc` is used
 
 #### Without working load balancer (eg if not using metallb)
 
@@ -584,7 +590,7 @@ kafka-acls --command-config kafka.properties --bootstrap-server kafka.mydomain.e
 #### Print the available RBAC roles
 
 ```shell
-confluent iam rbac role list -o json | jq -r .[].name
+confluent iam rbac role list -o json | jq -r '.[].name'
 ```
 
 > **Note**
