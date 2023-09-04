@@ -24,11 +24,6 @@ On K3d/K3s With testing and troubleshooting hints.
 * CFSSL (cloudflare ssl)
 * helm
 
-## Workstation Setup
-
-* [macOS](./doc/mac_setup.md)
-* [Linux](./doc/linux_setup.md)
-
 ### macOS
 
 For Apple ARM64, setup:
@@ -62,7 +57,12 @@ cd cfk_vault_mtls_rbac_walkthrough
 
 ## Cluster setup
 
-_already done as part of workstation setup_
+_Already done as part of workstation setup, repeated for your convenience_
+
+```shell
+k3d cluster create cfk-lab --servers 1 --agents 2 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--disable=servicelb@server:*"
+```
+
 
 ## MetalLB
 
@@ -78,6 +78,9 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.10/conf
 ```
 
 # configure metallb ingress address range
+
+> **Note**
+> Takes a minute or so for metallb to start running or you will get `failed calling webhook`
 
 ```shell
 ./scripts/configure_metallb_ingress_range.sh cfk-lab

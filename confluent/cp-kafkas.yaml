@@ -190,7 +190,7 @@ spec:
       authentication:
         type: mtls
         principalMappingRules:
-          - RULE:.*CN[\s]?=[\s]?([a-zA-Z0-9.]*)?.*/$1/
+          - RULE:.*CN[\\s]?=[\\s]?([a-zA-Z0-9.]*)?.*/$1/
       externalAccess:
         type: loadBalancer
         loadBalancer:
@@ -204,7 +204,7 @@ spec:
       authentication:
         type: mtls
         principalMappingRules:
-          - RULE:.*CN[\s]?=[\s]?([a-zA-Z0-9.]*)?.*/$1/
+          - RULE:.*CN[\\s]?=[\\s]?([a-zA-Z0-9.]*)?.*/$1/
       tls:
         enabled: true
         # Will use the certificates in the parent secretRef tls-kafka

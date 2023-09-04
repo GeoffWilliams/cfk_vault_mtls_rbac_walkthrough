@@ -13,8 +13,6 @@ spec:
   logVolumeCapacity: 10Gi
   authentication:
     type: mtls
-    principalMappingRules:
-      - RULE:.*CN[\s]?=[\s]?([a-zA-Z0-9.]*)?.*/$1/
   tls:
     directoryPathInContainer: /vault/secrets
   podTemplate:
