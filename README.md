@@ -785,3 +785,22 @@ kubectl exec -i -t dnsutils -n default  -- nslookup kafka.confluent.svc.cluster.
 ### Secrets all gone from vault!
 
 When the vault container restarts it looses all its secrets and service accounts. Re-run the instructions to load them.
+
+### Strange errors using Confluent CLI
+
+EG:
+
+```shell
+$ confluent kafka acl list  --url https://kafka-mds.mydomain.example:443
+Error: unable to establish Kafka REST connection: https://kafka-mds.mydomain.example:44/v3: dial tcp 172.18.0.104:44: connect: no route to host
+$ confluent kafka acl list  --url https://kafka-mds.mydomain.example:123
+Error: unable to establish Kafka REST connection: https://kafka-mds.mydomain.example:12/v3: dial tcp 172.18.0.104:12: connect: no route to host
+```
+
+1. Make sure using latest Confluent CLI
+2. Make sure to append `/kafka` to the `--url`, eg:
+
+```shell
+$ confluent kafka acl list  --url https://kafka-mds.mydomain.example:443/kafka
+None found.
+```
