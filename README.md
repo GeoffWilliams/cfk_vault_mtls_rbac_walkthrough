@@ -663,6 +663,8 @@ kafka-console-consumer --bootstrap-server kafka.mydomain.example:9092 --consumer
 k3d cluster delete cfk-lab
 ```
 
+Dont forget to remove any entries you created from `/etc/hosts`.
+
 ## Troubleshooting
 
 ### Pod(s) stuck on `INIT`
